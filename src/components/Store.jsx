@@ -38,6 +38,7 @@ export default function Store() {
 			try {
 				const res = await api.get(`/store/${fk_store_id}`)
 				const store = res.data
+				delete store.data.password
 				setForm(store.data)
 			} catch (err) {
 				console.error('Erro ao buscar loja:', err)
@@ -105,8 +106,7 @@ export default function Store() {
 				data: {
 					name: form.name,
 					email: form.email,
-					image: form.image, // atualizado no upload
-					password: form.password || 'senha123', // ou outro valor default se necessário
+					image: form.image,
 					minimum_order: Number(form.minimum_order),
 					delivery_time_min: Number(form.delivery_time_min),
 					delivery_time_max: Number(form.delivery_time_max),
@@ -136,10 +136,18 @@ export default function Store() {
 			<div className='flex justify-between items-center'>
 				<h2 className='text-xl font-bold'>Dados da Loja</h2>
 				<div className='space-x-2'>
-					<Button onClick={() => setEditando(true)} className={`text-white ${editando ? 'bg-gray-400' : 'bg-yellow-500'}`} disabled={editando}>
+					<Button
+						onClick={() => setEditando(true)}
+						className={`text-white ${editando ? 'bg-gray-400' : 'bg-yellow-500'}`}
+						disabled={editando}
+					>
 						Editar
 					</Button>
-					<Button onClick={handleSalvar} className={`text-white ${editando ? 'bg-blue-500' : 'bg-gray-400'}`} disabled={!editando}>
+					<Button
+						onClick={handleSalvar}
+						className={`text-white ${editando ? 'bg-blue-500' : 'bg-gray-400'}`}
+						disabled={!editando}
+					>
 						Salvar
 					</Button>
 				</div>
@@ -158,22 +166,46 @@ export default function Store() {
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='pedido_minimo'>Pedido Mínimo (R$)</Label>
-					<Input id='pedido_minimo' name='minimum_order' value={form.minimum_order} onChange={handleChange} disabled={!editando} />
+					<Input
+						id='pedido_minimo'
+						name='minimum_order'
+						value={form.minimum_order}
+						onChange={handleChange}
+						disabled={!editando}
+					/>
 				</div>
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='taxa_entrega'>Taxa de Entrega (R$)</Label>
-					<Input id='taxa_entrega' name='default_delivery_fee' value={form.default_delivery_fee} onChange={handleChange} disabled={!editando} />
+					<Input
+						id='taxa_entrega'
+						name='default_delivery_fee'
+						value={form.default_delivery_fee}
+						onChange={handleChange}
+						disabled={!editando}
+					/>
 				</div>
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='tempo_entrega_min'>Tempo Mínimo de Entrega (min)</Label>
-					<Input id='tempo_entrega_min' name='delivery_time_min' value={form.delivery_time_min} onChange={handleChange} disabled={!editando} />
+					<Input
+						id='tempo_entrega_min'
+						name='delivery_time_min'
+						value={form.delivery_time_min}
+						onChange={handleChange}
+						disabled={!editando}
+					/>
 				</div>
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='tempo_entrega_max'>Tempo Máximo de Entrega (min)</Label>
-					<Input id='tempo_entrega_max' name='delivery_time_max' value={form.delivery_time_max} onChange={handleChange} disabled={!editando} />
+					<Input
+						id='tempo_entrega_max'
+						name='delivery_time_max'
+						value={form.delivery_time_max}
+						onChange={handleChange}
+						disabled={!editando}
+					/>
 				</div>
 
 				<div className='flex flex-col gap-2'>
@@ -183,7 +215,11 @@ export default function Store() {
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='estado'>Estado</Label>
-					<Select onValueChange={(value) => handleChange({ target: { name: 'estado', value } })} value={form.estado} disabled={!editando}>
+					<Select
+						onValueChange={(value) => handleChange({ target: { name: 'estado', value } })}
+						value={form.estado}
+						disabled={!editando}
+					>
 						<SelectTrigger id='estado'>
 							<SelectValue placeholder='Selecione o estado' />
 						</SelectTrigger>
@@ -199,7 +235,11 @@ export default function Store() {
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='cidade'>Cidade</Label>
-					<Select onValueChange={(value) => handleChange({ target: { name: 'cidade', value } })} value={form.cidade} disabled={!editando || !form.estado}>
+					<Select
+						onValueChange={(value) => handleChange({ target: { name: 'cidade', value } })}
+						value={form.cidade}
+						disabled={!editando || !form.estado}
+					>
 						<SelectTrigger id='cidade'>
 							<SelectValue placeholder='Selecione a cidade' />
 						</SelectTrigger>
@@ -231,10 +271,22 @@ export default function Store() {
 				<div className='flex flex-col gap-2 w-full mt-6'>
 					<Label>Imagem da Loja</Label>
 					<div className='w-40 h-40 border rounded-xl overflow-hidden relative cursor-pointer group'>
-						<input type='file' accept='image/*' onChange={(e) => handleImageChange(e)} className='absolute inset-0 opacity-0 cursor-pointer z-10' disabled={!editando} />
-						<img src={form.image || 'https://via.placeholder.com/160x160?text=Logo'} alt='Logo da loja' className='w-full h-full object-cover group-hover:opacity-60 transition duration-200' />
+						<input
+							type='file'
+							accept='image/*'
+							onChange={(e) => handleImageChange(e)}
+							className='absolute inset-0 opacity-0 cursor-pointer z-10'
+							disabled={!editando}
+						/>
+						<img
+							src={form.image || 'https://via.placeholder.com/160x160?text=Logo'}
+							alt='Logo da loja'
+							className='w-full h-full object-cover group-hover:opacity-60 transition duration-200'
+						/>
 						{editando && (
-							<div className='absolute inset-0 flex items-center justify-center text-white font-bold opacity-0 group-hover:opacity-100 transition duration-200 bg-black/50'>Alterar</div>
+							<div className='absolute inset-0 flex items-center justify-center text-white font-bold opacity-0 group-hover:opacity-100 transition duration-200 bg-black/50'>
+								Alterar
+							</div>
 						)}
 					</div>
 				</div>
