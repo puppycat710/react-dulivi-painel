@@ -1,76 +1,67 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../services/api'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table'
-import { MessageActions } from './MessageActions'
+import {
+	Table,
+	TableBody,
+	TableCaption,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '../../../components/ui/table'
+import { GroupActions } from './MessageActions'
 
-export default function MessageList() {
-	const [deliveryAreas, setDeliveryArea] = useState([])
+export default function GroupList() {
+	const [messages, setMessages] = useState([])
 	const fk_store_id = sessionStorage.getItem('fk_store_id')
+  const token = sessionStorage.getItem('token')
 
 	useEffect(() => {
-		const fetchDeliveryArea = async () => {
+		const fetchMessages = async () => {
 			try {
-				// 1 - Buscar cidades da loja
-				const citiesResponse = await api.get(`/city/all?fk_store_id=${fk_store_id}`)
+				const response = await api.get(`/message/all?fk_store_id=${fk_store_id}`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
 
-				if (!citiesResponse.data.success) {
-					console.warn('Nenhuma cidade encontrada para essa loja.')
-					setDeliveryArea([])
-					return
+				if (response.data.success) {
+					setMessages(response.data.data)
+				} else {
+					console.warn('Nenhum produto encontrado.')
 				}
-
-				const cities = citiesResponse.data.data
-				const cityIds = cities.map((c) => c.id)
-
-				// 2 - Buscar bairros de cada cidade em paralelo
-				const deliveryResponses = await Promise.all(
-					cityIds.map(async (cityId) => {
-						try {
-							const res = await api.get(`/deliveryarea/all?fk_store_cities_id=${cityId}`)
-							return res.data.success ? res.data.data : []
-						} catch (err) {
-							console.warn(`Erro ao buscar bairros da cidade ${cityId}:`, err)
-							return []
-						}
-					})
-				)
-
-				// 3 - Juntar todos os bairros e salvar no estado
-				const allDeliveryAreas = deliveryResponses.flat()
-				setDeliveryArea(allDeliveryAreas)
 			} catch (err) {
-				console.error('Erro ao buscar bairros:', err)
+				console.error('Erro ao buscar produtos:', err)
 			}
 		}
 
-		fetchDeliveryArea()
+		fetchMessages()
 	}, [fk_store_id])
 
 	return (
-		<div className='overflow-hidden rounded-md border'>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Bairro</TableHead>
-						<TableHead>Taxa de Entrega</TableHead>
-						<TableHead>Tempo mínimo de entrega</TableHead>
-						<TableHead>Tempo máximo de entrega</TableHead>
+		<Table>
+			<TableCaption>Lista de disparos cadastrados</TableCaption>
+			<TableHeader>
+				<TableRow>
+					<TableHead>Texto do disparo</TableHead>
+					<TableHead>Data</TableHead>
+					<TableHead>Grupo de contatos</TableHead>
+					<TableHead>Status</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{messages.map((message) => (
+					<TableRow key={message.id}>
+						<TableCell>{message.text}</TableCell>
+						<TableCell>{message.send_at}</TableCell>
+						<TableCell>{message.fk_group_id}</TableCell>
+						<TableCell>{message.sent}</TableCell>
+						<TableCell className='text-right'>
+							<GroupActions message={message} />
+						</TableCell>
 					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{deliveryAreas.map((deliveryArea) => (
-						<TableRow key={deliveryArea.id}>
-							<TableCell>{deliveryArea.name}</TableCell>
-							<TableCell>R$ {deliveryArea.delivery_fee}</TableCell>
-							<TableCell>{deliveryArea.delivery_time_min} minutos</TableCell>
-							<TableCell>{deliveryArea.delivery_time_max} minutos</TableCell>
-							<TableCell className='text-right'>
-								<MessageActions deliveryArea={deliveryArea} />
-							</TableCell>
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
-		</div>
+				))}
+			</TableBody>
+		</Table>
 	)
 }

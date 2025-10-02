@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Input } from '../../../components/ui/input'
 import { Label } from '../../../components/ui/label'
 import { Button } from '../../../components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select'
+import { Checkbox } from '../../../components/ui/checkbox'
 import {
 	Dialog,
 	DialogContent,
@@ -24,34 +24,45 @@ import { useAlert } from '../../hooks/useAlert'
 // API
 import { api } from '../../services/api'
 
-export function MessageActions({ deliveryArea }) {
+export function GroupActions({ group }) {
 	const [open, setOpen] = useState(false)
-	const [form, setForm] = useState({ ...deliveryArea })
-	const [cities, setCities] = useState([])
-	// Alert
+	const [form, setForm] = useState({ ...group })
+	const [contacts, setContacts] = useState([])
+	const [selectedContacts, setSelectedContacts] = useState([])
 	const { alert, showAlert } = useAlert()
-	// Session
-	const token = sessionStorage.getItem('token')
 	const fk_store_id = sessionStorage.getItem('fk_store_id')
-	// Load API cities on startup
+	const token = sessionStorage.getItem('token')
+	// Carregar contatos da loja
 	useEffect(() => {
-		async function fetchCities() {
-			try {
-				const res = await api.get(`/city/all?fk_store_id=${fk_store_id}`)
-				setCities(res.data.data)
-			} catch (err) {
-				showAlert(
-					ErrorAlert,
-					{
-						title: 'Erro ao buscar cidades!',
-						text: `${err}`,
-					},
-					1500
-				)
-			}
+		async function fecthContact() {
+			const res = await api.get(`/contact/all?fk_store_id=${fk_store_id}`, {
+				headers: { Authorization: `Bearer ${token}` },
+			})
+			setContacts(res.data.data)
 		}
-		fetchCities()
+		fecthContact()
 	}, [])
+	// Carregar grupos do contato
+	useEffect(() => {
+		async function fetchContactGroups() {
+			const res = await api.get(`/contact-group/all?fk_store_id=${fk_store_id}`, {
+				headers: { Authorization: `Bearer ${token}` },
+			})
+
+			// pega todos vínculos desse grupo
+			const found = res.data.data
+				.filter((cg) => cg.fk_group_id === form.id) // compara com o grupo atual
+				.map((cg) => cg.fk_contact_id) // pega os contatos vinculados
+
+			setSelectedContacts(found)
+		}
+
+		if (open) fetchContactGroups()
+	}, [open])
+	// alternar contato
+	const toggleContact = (groupId) => {
+		setSelectedContacts((prev) => (prev.includes(groupId) ? prev.filter((g) => g !== groupId) : [...prev, groupId]))
+	}
 	// Change Input
 	const handleChange = (e) => {
 		const { name, value } = e.target
@@ -60,12 +71,28 @@ export function MessageActions({ deliveryArea }) {
 			[name]: value,
 		}))
 	}
-	// Update Delivery Area
-	const handleUpdateDeliveryArea = async () => {
+	// Update Group
+	const handleUpdateGroup = async () => {
 		try {
+			// atualizar grupo
 			await api.put(
-				`/deliveryarea/update/${form.id}`,
+				`/group/update/${form.id}`,
 				{ data: form },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+						'Content-Type': 'application/json',
+					},
+				}
+			)
+			// Atualizar vínculo contato-grupo
+			await api.post(
+				`/contact-group/bulk-upsert`, // precisa já ter esse id carregado no form
+				{
+					fk_group_id: form.id,
+					contacts: selectedContacts,
+					fk_store_id: Number(fk_store_id),
+				},
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -78,10 +105,10 @@ export function MessageActions({ deliveryArea }) {
 			handleUpdateError()
 		}
 	}
-	// Delete Delivery Area
-	const handleDeleteDeliveryArea = async () => {
+	// Delete Group
+	const handleDeleteGroup = async () => {
 		try {
-			await api.delete(`/deliveryarea/delete/${form.id}`, {
+			await api.delete(`/group/delete/${form.id}`, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
@@ -101,7 +128,7 @@ export function MessageActions({ deliveryArea }) {
 				text: 'O item foi atualizado.',
 			},
 			1500,
-			() => (window.location.href = '/delivery')
+			() => (window.location.href = '/disparos')
 		)
 	}
 	const handleUpdateError = () => {
@@ -113,7 +140,7 @@ export function MessageActions({ deliveryArea }) {
 				text: 'O item não foi atualizado.',
 			},
 			1500,
-			() => (window.location.href = '/delivery')
+			() => (window.location.href = '/disparos')
 		)
 	}
 	// Delete Alert
@@ -126,7 +153,7 @@ export function MessageActions({ deliveryArea }) {
 				text: 'O item foi removido.',
 			},
 			1500,
-			() => (window.location.href = '/delivery')
+			() => (window.location.href = '/disparos')
 		)
 	}
 	const handleDeleteError = () => {
@@ -138,7 +165,7 @@ export function MessageActions({ deliveryArea }) {
 				text: 'O item não foi removido.',
 			},
 			1500,
-			() => (window.location.href = '/delivery')
+			() => (window.location.href = '/disparos')
 		)
 	}
 
@@ -155,74 +182,29 @@ export function MessageActions({ deliveryArea }) {
 					</DialogTrigger>
 					<DialogContent className='sm:max-w-[600px]'>
 						<DialogHeader>
-							<DialogTitle>Editar Categoria</DialogTitle>
+							<DialogTitle>Editar Grupo</DialogTitle>
 							<DialogDescription>Atualize os dados e clique em salvar para confirmar.</DialogDescription>
 						</DialogHeader>
 
 						<div className='grid gap-4 py-4'>
 							<div className='flex flex-col gap-2'>
-								<Label htmlFor='name'>Bairro:</Label>
-								<Input name='name' placeholder='Bairro' value={form.name} onChange={handleChange} required />
+								<Label htmlFor='name'>Grupo:</Label>
+								<Input name='name' placeholder='Grupo' value={form.name} onChange={handleChange} required />
 							</div>
-
+							{/* Select de Grupos */}
 							<div className='flex flex-col gap-2'>
-								<Label htmlFor='delivery_fee'>Taxa de Entrega:</Label>
-								<Input
-									name='delivery_fee'
-									placeholder='Taxa de Entrega'
-									value={form.delivery_fee}
-									onChange={handleChange}
-									required
-								/>
-							</div>
-
-							<div className='flex flex-col gap-2'>
-								<Label htmlFor='delivery_time_min'>Tempo mínimo de entrega:</Label>
-								<Input
-									name='delivery_time_min'
-									placeholder='Tempo mínimo de entrega'
-									value={form.delivery_time_min}
-									onChange={handleChange}
-									required
-								/>
-							</div>
-
-							<div className='flex flex-col gap-2'>
-								<Label htmlFor='delivery_time_max'>Tempo máximo de entrega:</Label>
-								<Input
-									name='delivery_time_max'
-									placeholder='Tempo máximo de entrega'
-									value={form.delivery_time_max}
-									onChange={handleChange}
-									required
-								/>
-							</div>
-
-							{/* Select de Cidade */}
-							<div className='flex flex-col gap-2'>
-								<Label htmlFor='category'>Cidade:</Label>
-								<Select
-									required
-									value={form.fk_store_cities_id?.toString() || ''}
-									onValueChange={(value) => setForm((prev) => ({ ...prev, fk_store_cities_id: Number(value) }))}
-								>
-									<SelectTrigger>
-										<SelectValue
-											placeholder={
-												form.fk_store_cities_id
-													? cities.find((c) => c.id === form.fk_store_cities_id)?.name
-													: 'Selecione uma cidade'
-											}
-										/>
-									</SelectTrigger>
-									<SelectContent>
-										{cities.map((city) => (
-											<SelectItem key={city.id} value={city.id.toString()}>
-												{city.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+								<Label>Contatos:</Label>
+								<div className='flex flex-col gap-2 max-h-40 overflow-auto border rounded p-2'>
+									{contacts.map((contact) => (
+										<div key={contact.id} className='flex items-center gap-2'>
+											<Checkbox
+												checked={selectedContacts.includes(contact.id)}
+												onCheckedChange={() => toggleContact(contact.id)}
+											/>
+											<span>{contact.name}</span>
+										</div>
+									))}
+								</div>
 							</div>
 						</div>
 
@@ -230,12 +212,12 @@ export function MessageActions({ deliveryArea }) {
 							<Button variant='outline' onClick={() => setOpen(false)}>
 								Cancelar
 							</Button>
-							<Button onClick={handleUpdateDeliveryArea}>Salvar</Button>
+							<Button onClick={handleUpdateGroup}>Salvar</Button>
 						</DialogFooter>
 					</DialogContent>
 				</Dialog>
 				{/* delete button with alert dialog */}
-				<DeleteButtonWithDialog onConfirm={handleDeleteDeliveryArea} />
+				<DeleteButtonWithDialog onConfirm={handleDeleteGroup} />
 			</div>
 			{alert}
 		</>

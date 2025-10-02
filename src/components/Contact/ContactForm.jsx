@@ -27,7 +27,7 @@ export default function ContactForm() {
 	// Session
 	const fk_store_id = sessionStorage.getItem('fk_store_id')
 	const token = sessionStorage.getItem('token')
-	// Load API categories on startup
+	// Load API GROUPS on startup
 	useEffect(() => {
 		async function fetchGroups() {
 			try {

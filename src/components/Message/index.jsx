@@ -2,12 +2,12 @@ import { useState } from 'react'
 import MenuTabs from '../MenuTabs'
 import MessageList from './MessageList'
 import MessageForm from './MessageForm'
-import GroupList from '../Group/GroupList'
 import GroupForm from '../Group/GroupForm'
+import GroupList from '../Group/GroupList'
 import ContatctList from '../Contact/ContatctList'
 import ContactForm from '../Contact/ContactForm'
 
-export default function Message() {
+export default function Group() {
 	const [activeTab, setActiveTab] = useState('Disparos')
 
 	const tabs = ['Disparos', 'Cadastrar disparos', 'Contatos', 'Cadastrar contatos', 'Grupos', 'Cadastrar grupos']
