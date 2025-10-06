@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react'
 import { Input } from '../../../components/ui/input'
 import { Label } from '../../../components/ui/label'
 import { Button } from '../../../components/ui/button'
-import { Checkbox } from '../../../components/ui/checkbox'
+import { Textarea } from '../../../components/ui/textarea'
+import { Calendar } from '../../../components/ui/calendar'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select'
+import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/popover'
 import {
 	Dialog,
 	DialogContent,
@@ -13,6 +16,7 @@ import {
 	DialogFooter,
 	DialogTrigger,
 } from '../../../components/ui/dialog'
+import { ChevronDownIcon } from 'lucide-react'
 // Button
 import { DeleteButtonWithDialog } from '../DeleteButtonWithDialog'
 // SVG
@@ -24,44 +28,64 @@ import { useAlert } from '../../hooks/useAlert'
 // API
 import { api } from '../../services/api'
 
-export function GroupActions({ group }) {
+export function MessageActions({ message }) {
 	const [open, setOpen] = useState(false)
-	const [form, setForm] = useState({ ...group })
-	const [contacts, setContacts] = useState([])
-	const [selectedContacts, setSelectedContacts] = useState([])
+	const [form, setForm] = useState({ ...message })
+	const [groups, setGroups] = useState([])
+	const [date, setDate] = useState('')
+	const [time, setTime] = useState('10:30:00')
+	const [open2, setOpen2] = useState(false)
+	//Alert
 	const { alert, showAlert } = useAlert()
+	//Session
 	const fk_store_id = sessionStorage.getItem('fk_store_id')
 	const token = sessionStorage.getItem('token')
-	// Carregar contatos da loja
+	// Load API GROUPS on startup
 	useEffect(() => {
-		async function fecthContact() {
-			const res = await api.get(`/contact/all?fk_store_id=${fk_store_id}`, {
-				headers: { Authorization: `Bearer ${token}` },
-			})
-			setContacts(res.data.data)
+		async function fetchGroups() {
+			try {
+				const res = await api.get(`/group/all?fk_store_id=${fk_store_id}`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
+				setGroups(res.data.data)
+			} catch (err) {
+				showAlert(
+					ErrorAlert,
+					{
+						title: 'Erro ao buscar grupos!',
+						text: `${err}`,
+					},
+					1500
+				)
+			}
 		}
-		fecthContact()
+		fetchGroups()
 	}, [])
-	// Carregar grupos do contato
-	useEffect(() => {
-		async function fetchContactGroups() {
-			const res = await api.get(`/contact-group/all?fk_store_id=${fk_store_id}`, {
-				headers: { Authorization: `Bearer ${token}` },
+	// Image Upload
+	const handleImageChange = async (e) => {
+		const file = e.target.files[0]
+		if (!file) return
+		// lock button
+		setUploading(true)
+		try {
+			const formData = new FormData()
+			formData.append('imagem', file)
+			// upload image to supabase
+			const res = await api.post('/upload', formData, {
+				headers: { 'Content-Type': 'multipart/form-data' },
 			})
-
-			// pega todos vínculos desse grupo
-			const found = res.data.data
-				.filter((cg) => cg.fk_group_id === form.id) // compara com o grupo atual
-				.map((cg) => cg.fk_contact_id) // pega os contatos vinculados
-
-			setSelectedContacts(found)
+			// add image url
+			if (res.data?.url) {
+				setForm((prev) => ({ ...prev, image: res.data.url }))
+			}
+		} catch {
+			handleUploadError()
+		} finally {
+			// unlock button
+			setUploading(false)
 		}
-
-		if (open) fetchContactGroups()
-	}, [open])
-	// alternar contato
-	const toggleContact = (groupId) => {
-		setSelectedContacts((prev) => (prev.includes(groupId) ? prev.filter((g) => g !== groupId) : [...prev, groupId]))
 	}
 	// Change Input
 	const handleChange = (e) => {
@@ -71,28 +95,19 @@ export function GroupActions({ group }) {
 			[name]: value,
 		}))
 	}
-	// Update Group
-	const handleUpdateGroup = async () => {
+	// Update Message
+	const handleUpdateMessage = async () => {
+		const send_at = formatDateTime(date, time)
+
 		try {
+			const payload = {
+				...form,
+				send_at,
+			}
 			// atualizar grupo
 			await api.put(
-				`/group/update/${form.id}`,
-				{ data: form },
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-						'Content-Type': 'application/json',
-					},
-				}
-			)
-			// Atualizar vínculo contato-grupo
-			await api.post(
-				`/contact-group/bulk-upsert`, // precisa já ter esse id carregado no form
-				{
-					fk_group_id: form.id,
-					contacts: selectedContacts,
-					fk_store_id: Number(fk_store_id),
-				},
+				`/message/update/${form.id}`,
+				{ data: payload },
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -105,10 +120,10 @@ export function GroupActions({ group }) {
 			handleUpdateError()
 		}
 	}
-	// Delete Group
-	const handleDeleteGroup = async () => {
+	// Delete Message
+	const handleDeleteMessage = async () => {
 		try {
-			await api.delete(`/group/delete/${form.id}`, {
+			await api.delete(`/message/delete/${form.id}`, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
@@ -168,6 +183,17 @@ export function GroupActions({ group }) {
 			() => (window.location.href = '/disparos')
 		)
 	}
+	// Formatar data e hora
+	function formatDateTime(date, time) {
+		if (!date || !time) return ''
+
+		const [hours, minutes, seconds] = time.split(':')
+		const year = date.getFullYear()
+		const month = String(date.getMonth() + 1).padStart(2, '0')
+		const day = String(date.getDate()).padStart(2, '0')
+
+		return `${year}-${month}-${day} ${hours}:${minutes}:${seconds || '00'}`
+	}
 
 	return (
 		<>
@@ -188,22 +214,86 @@ export function GroupActions({ group }) {
 
 						<div className='grid gap-4 py-4'>
 							<div className='flex flex-col gap-2'>
-								<Label htmlFor='name'>Grupo:</Label>
-								<Input name='name' placeholder='Grupo' value={form.name} onChange={handleChange} required />
+								<Label htmlFor='text'>Mensagem:</Label>
+								<Textarea name='text' placeholder='Boa noite...' value={form.text} onChange={handleChange} required />
 							</div>
 							{/* Select de Grupos */}
 							<div className='flex flex-col gap-2'>
-								<Label>Contatos:</Label>
-								<div className='flex flex-col gap-2 max-h-40 overflow-auto border rounded p-2'>
-									{contacts.map((contact) => (
-										<div key={contact.id} className='flex items-center gap-2'>
-											<Checkbox
-												checked={selectedContacts.includes(contact.id)}
-												onCheckedChange={() => toggleContact(contact.id)}
-											/>
-											<span>{contact.name}</span>
-										</div>
-									))}
+								<Label htmlFor='contact'>Grupo:</Label>
+								<Select
+									required
+									value={form.fk_group_id?.toString() || ''}
+									onValueChange={(value) => setForm((prev) => ({ ...prev, fk_group_id: Number(value) }))}
+								>
+									<SelectTrigger>
+										<SelectValue placeholder='Selecione um grupo' />
+									</SelectTrigger>
+									<SelectContent>
+										{groups.map((group) => (
+											<SelectItem key={group.id} value={group.id.toString()}>
+												{group.name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+
+							<div className='flex flex-col gap-2'>
+								<div className='flex gap-4'>
+									<div className='flex flex-col gap-3'>
+										<Label htmlFor='date-picker' className='px-1'>
+											Data
+										</Label>
+										<Popover open={open2} onOpenChange={setOpen2}>
+											<PopoverTrigger asChild>
+												<Button variant='outline' id='date-picker' className='w-32 justify-between font-normal'>
+													{date ? date.toLocaleDateString() : 'Select date'}
+													<ChevronDownIcon />
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent className='w-auto overflow-hidden p-0' align='start'>
+												<Calendar
+													mode='single'
+													selected={date}
+													captionLayout='dropdown'
+													onSelect={(date) => {
+														setDate(date)
+														setOpen2(false)
+													}}
+												/>
+											</PopoverContent>
+										</Popover>
+									</div>
+									<div className='flex flex-col gap-3'>
+										<Label htmlFor='time-picker' className='px-1'>
+											Horário
+										</Label>
+										<Input
+											value={time}
+											onChange={(e) => setTime(e.target.value)}
+											type='time'
+											id='time-picker'
+											step='1'
+											className='bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+										/>
+									</div>
+								</div>
+							</div>
+
+							<div className='flex flex-col gap-2'>
+								<Label htmlFor='image'>Imagem:</Label>
+								<div className='w-40 h-40 border rounded-xl overflow-hidden relative cursor-pointer group'>
+									<input
+										type='file'
+										accept='image/*'
+										onChange={handleImageChange}
+										className='absolute inset-0 opacity-0 cursor-pointer z-10'
+									/>
+									<img
+										src={form.image || '/assets/image.png'}
+										alt='Imagem do produto'
+										className='w-full h-full object-cover group-hover:opacity-60 transition duration-200'
+									/>
 								</div>
 							</div>
 						</div>
@@ -212,12 +302,12 @@ export function GroupActions({ group }) {
 							<Button variant='outline' onClick={() => setOpen(false)}>
 								Cancelar
 							</Button>
-							<Button onClick={handleUpdateGroup}>Salvar</Button>
+							<Button onClick={handleUpdateMessage}>Salvar</Button>
 						</DialogFooter>
 					</DialogContent>
 				</Dialog>
 				{/* delete button with alert dialog */}
-				<DeleteButtonWithDialog onConfirm={handleDeleteGroup} />
+				<DeleteButtonWithDialog onConfirm={handleDeleteMessage} />
 			</div>
 			{alert}
 		</>

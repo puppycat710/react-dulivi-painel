@@ -190,6 +190,24 @@ export default function GroupForm() {
 						</SelectContent>
 					</Select>
 				</div>
+				{/* Select de Frequencia */}
+				<div className='flex flex-col gap-2'>
+					<Label htmlFor='contact'>Frequência:</Label>
+					<Select
+						required
+						value={form.frequency || ''}
+						onValueChange={(value) => setForm((prev) => ({ ...prev, frequency: value }))}
+					>
+						<SelectTrigger>
+							<SelectValue placeholder='Selecione uma frequência' />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value={'once'}>Apenas uma vez</SelectItem>
+							<SelectItem value={'daily'}>Todos os dias</SelectItem>
+							<SelectItem value={'weekdays'}>De segunda a sexta</SelectItem>
+						</SelectContent>
+					</Select>
+				</div>
 
 				<div className='flex flex-col gap-2'>
 					<div className='flex gap-4'>

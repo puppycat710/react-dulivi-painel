@@ -9,7 +9,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '../../../components/ui/table'
-import { GroupActions } from './MessageActions'
+import { MessageActions } from './MessageActions'
 
 export default function GroupList() {
 	const [messages, setMessages] = useState([])
@@ -57,7 +57,7 @@ export default function GroupList() {
 						<TableCell>{message.fk_group_id}</TableCell>
 						<TableCell>{message.sent}</TableCell>
 						<TableCell className='text-right'>
-							<GroupActions message={message} />
+							<MessageActions message={message} />
 						</TableCell>
 					</TableRow>
 				))}
