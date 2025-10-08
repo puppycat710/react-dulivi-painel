@@ -91,7 +91,7 @@ export default function GroupForm() {
 	}
 	// Create Message
 	const handleMessage = async () => {
-		if (!form.text || !form.fk_group_id || !fk_store_id || !date || !time) {
+		if (!form.text || !form.fk_group_id || form.frequency || !fk_store_id || !date || !time) {
 			showAlert(
 				ErrorAlert,
 				{

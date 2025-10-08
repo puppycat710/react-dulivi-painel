@@ -8,7 +8,7 @@ export default function IndexPage({ page }) {
 
   return (
     <section className='h-screen flex flex-col overflow-hidden'>
-      <HeaderMenu />
+      <HeaderMenu setActivePage={setActivePage} />
       <div className='flex flex-1 overflow-hidden'>
         <SideMenu activePage={activePage} setActivePage={setActivePage} />
         <main className='flex-1 pt-[20px] px-[20px] overflow-y-auto relative'>

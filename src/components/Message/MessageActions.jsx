@@ -33,7 +33,7 @@ export function MessageActions({ message }) {
 	const [form, setForm] = useState({ ...message })
 	const [groups, setGroups] = useState([])
 	const [date, setDate] = useState('')
-	const [time, setTime] = useState('10:30:00')
+	const [time, setTime] = useState('18:30:00')
 	//Alert
 	const { alert, showAlert } = useAlert()
 	//Session
@@ -62,6 +62,21 @@ export function MessageActions({ message }) {
 		}
 		fetchGroups()
 	}, [])
+	// Load time
+	useEffect(() => {
+		if (form?.send_at) {
+			// Exemplo de send_at: "2025-10-07 09:00:00"
+			const [datePart, timePart] = form.send_at.split(' ')
+
+			// Define a data para o Calendar
+			const [year, month, day] = datePart.split('-').map(Number)
+			setDate(new Date(year, month - 1, day))
+
+			// Define a hora para o input type="time"
+			const [hours, minutes, seconds] = timePart.split(':')
+			setTime(`${hours}:${minutes}:${seconds || '00'}`)
+		}
+	}, [form.send_at])
 	// Change Input
 	const handleChange = (e) => {
 		const { name, value } = e.target
@@ -96,7 +111,7 @@ export function MessageActions({ message }) {
 	}
 	// Update Message
 	const handleUpdateMessage = async () => {
-		if (!form.text || !form.fk_group_id || !fk_store_id || !time) {
+		if (!form.text || !form.fk_group_id || !fk_store_id || !time || !form.frequency) {
 			showAlert(
 				ErrorAlert,
 				{
@@ -293,7 +308,7 @@ export function MessageActions({ message }) {
 										<Label htmlFor='date-picker' className='px-1'>
 											Data
 										</Label>
-										<Calendar mode='single' selected={date} captionLayout='dropdown' onSelect={(date) => setDate(date)} />
+										<Calendar mode='single' selected={date} captionLayout='dropdown' value={date} onSelect={(date) => setDate(date)} />
 									</div>
 									<div className='flex flex-col gap-2'>
 										<Label htmlFor='image'>Imagem:</Label>

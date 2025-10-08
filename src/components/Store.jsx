@@ -11,9 +11,10 @@ export default function Store() {
 	const [form, setForm] = useState(null)
 	const [estados, setEstados] = useState([])
 	const [cidades, setCidades] = useState([])
+	const [openTime, setOpenTime] = useState('')
+	const [closeTime, setCloseTime] = useState('')
 	const fk_store_id = sessionStorage.getItem('fk_store_id')
 	const token = sessionStorage.getItem('token')
-
 	// Carrega estados no início
 	useEffect(() => {
 		axios.get('https://servicodados.ibge.gov.br/api/v1/localidades/estados').then((res) => {
@@ -21,7 +22,6 @@ export default function Store() {
 			setEstados(ordenados)
 		})
 	}, [])
-
 	// Carrega cidades quando muda estado
 	useEffect(() => {
 		if (form?.estado) {
@@ -31,7 +31,6 @@ export default function Store() {
 			})
 		}
 	}, [form?.estado])
-
 	// Busca dados da loja
 	useEffect(() => {
 		const fetchLoja = async () => {
@@ -46,11 +45,12 @@ export default function Store() {
 		}
 		if (fk_store_id) fetchLoja()
 	}, [fk_store_id])
-
+	// Change Input
 	const handleChange = (e) => {
 		const { name, value } = e.target
 		setForm((prev) => ({ ...prev, [name]: value }))
 	}
+	// CEP Change
 	const handleCepChange = async (e) => {
 		const cep = e.target.value.replace(/\D/g, '')
 		setForm((prev) => ({ ...prev, cep }))
@@ -73,7 +73,7 @@ export default function Store() {
 			}
 		}
 	}
-
+	// Upload Image
 	const handleImageChange = async (e) => {
 		const file = e.target.files[0]
 		if (!file) return
@@ -95,12 +95,15 @@ export default function Store() {
 			alert('Erro ao enviar imagem.')
 		}
 	}
-
+	// Salvar
 	const handleSalvar = async () => {
 		try {
 			// Montar endereço unificado para "store_location"
-			const store_location = `${form.bairro} - ${form.cidade}`
-
+			const store_location =
+				form.bairro?.trim() && form.cidade?.trim() ? `${form.bairro.trim()} - ${form.cidade.trim()}` : form.store_location
+			// Horarios
+			const open_time = formatTime(form.open_time)
+			const close_time = formatTime(form.close_time)
 			// Montar payload apenas com os campos aceitos
 			const dadosAtualizados = {
 				data: {
@@ -112,6 +115,8 @@ export default function Store() {
 					delivery_time_max: Number(form.delivery_time_max),
 					default_delivery_fee: Number(form.default_delivery_fee),
 					store_location,
+					open_time,
+					close_time,
 					subscription_status: form.subscription_status || 'inactive',
 				},
 			}
@@ -127,6 +132,12 @@ export default function Store() {
 			console.error('Erro ao salvar alterações:', error)
 			alert('Erro ao salvar. Verifique os dados.')
 		}
+	}
+	// Formatar data e hora
+	function formatTime(time) {
+		const [hours, minutes, seconds] = time.split(':')
+
+		return `${hours}:${minutes}:${seconds || '00'}`
 	}
 
 	if (!form) return <div>Carregando...</div>
@@ -164,11 +175,51 @@ export default function Store() {
 					<Input id='email' name='email' type='email' value={form.email} onChange={handleChange} disabled={!editando} />
 				</div>
 
+				<div className='flex flex-col gap-3'>
+					<Label htmlFor='time-picker' className='px-1'>
+						Horário de abertura
+					</Label>
+					<Input
+						value={form.open_time}
+						onChange={(e) =>
+							setForm((prev) => ({
+								...prev,
+								open_time: e.target.value,
+							}))
+						}
+						type='time'
+						id='time-picker'
+						step='1'
+						disabled={!editando}
+						className='bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+					/>
+				</div>
+				<div className='flex flex-col gap-3'>
+					<Label htmlFor='time-picker' className='px-1'>
+						Horário de fechamento
+					</Label>
+					<Input
+						value={form.close_time}
+						onChange={(e) =>
+							setForm((prev) => ({
+								...prev,
+								close_time: e.target.value,
+							}))
+						}
+						type='time'
+						id='time-picker'
+						step='1'
+						disabled={!editando}
+						className='bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+					/>
+				</div>
+
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='pedido_minimo'>Pedido Mínimo (R$)</Label>
 					<Input
 						id='pedido_minimo'
 						name='minimum_order'
+						type='number'
 						value={form.minimum_order}
 						onChange={handleChange}
 						disabled={!editando}
@@ -180,6 +231,7 @@ export default function Store() {
 					<Input
 						id='taxa_entrega'
 						name='default_delivery_fee'
+						type='number'
 						value={form.default_delivery_fee}
 						onChange={handleChange}
 						disabled={!editando}
@@ -191,6 +243,7 @@ export default function Store() {
 					<Input
 						id='tempo_entrega_min'
 						name='delivery_time_min'
+						type='number'
 						value={form.delivery_time_min}
 						onChange={handleChange}
 						disabled={!editando}
@@ -202,6 +255,7 @@ export default function Store() {
 					<Input
 						id='tempo_entrega_max'
 						name='delivery_time_max'
+						type='number'
 						value={form.delivery_time_max}
 						onChange={handleChange}
 						disabled={!editando}
@@ -210,7 +264,7 @@ export default function Store() {
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='cep'>CEP</Label>
-					<Input id='cep' name='cep' value={form.cep || ''} onChange={handleCepChange} disabled={!editando} />
+					<Input id='cep' name='cep' type='number' value={form.cep || ''} onChange={handleCepChange} disabled={!editando} />
 				</div>
 
 				<div className='flex flex-col gap-2'>
@@ -265,7 +319,7 @@ export default function Store() {
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='numero'>Número</Label>
-					<Input id='numero' name='numero' value={form.numero} onChange={handleChange} disabled={!editando} />
+					<Input id='numero' name='numero' type='number' value={form.numero} onChange={handleChange} disabled={!editando} />
 				</div>
 
 				<div className='flex flex-col gap-2 w-full mt-6'>
