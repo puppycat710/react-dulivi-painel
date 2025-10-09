@@ -100,7 +100,7 @@ export default function Store() {
 		try {
 			// Montar endereço unificado para "store_location"
 			const store_location =
-				form.bairro?.trim() && form.cidade?.trim() ? `${form.bairro.trim()} - ${form.cidade.trim()}` : form.store_location
+				form.bairro?.trim() && form.cidade?.trim() ? `${form.bairro.trim()}, ${form.cidade.trim()}` : form.store_location
 			// Horarios
 			const open_time = formatTime(form.open_time)
 			const close_time = formatTime(form.close_time)
