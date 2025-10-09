@@ -139,8 +139,8 @@ export default function HeaderMenu({ setActivePage }) {
 						</DropdownMenuContent>
 					</DropdownMenu>
 
-					<DropdownMenu className='cursor-pointer font-medium'>
-						<DropdownMenuTrigger>
+					<DropdownMenu className='font-medium'>
+						<DropdownMenuTrigger className='cursor-pointer'>
 							<div className='flex items-center gap-3'>
 								<span className='text-sm font-semibold'>{store?.name || ''}</span>
 								{store?.image ? (
