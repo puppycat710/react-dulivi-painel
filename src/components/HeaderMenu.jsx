@@ -135,7 +135,7 @@ export default function HeaderMenu({ setActivePage }) {
 								</div>
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem className={'font-medium underline text-xs'} onClick={() => setActivePage('Loja')}>Configurar horários</DropdownMenuItem>
+							<DropdownMenuItem className={'font-medium underline text-xs cursor-pointer'} onClick={() => setActivePage('Loja')}>Configurar horários</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 
