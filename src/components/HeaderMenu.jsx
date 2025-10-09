@@ -12,10 +12,13 @@ import { Switch } from '../../components/ui/switch'
 import SvgUser from '../components/svg/SvgUser'
 import SvgStatus from '../components/svg/SvgStatus'
 import SvgLogo from '../components/svg/SvgLogo'
+// Icon
+import { Clock, CreditCard, LogOut, Store } from 'lucide-react'
 // Hooks
 import { useAlert } from '../hooks/useAlert'
 // API
 import { api } from '../services/api'
+// Component
 import { ConfirmSwitch } from './ConfirmSwitch'
 
 export default function HeaderMenu({ setActivePage }) {
@@ -103,7 +106,7 @@ export default function HeaderMenu({ setActivePage }) {
 						<span className='text-dulivi text-2xl font-extrabold'>Dulivi</span>&nbsp;.com.br
 					</span>
 				</a>
-				<div className='flex items-center gap-6'>
+				<div className='flex items-center gap-3'>
 					<DropdownMenu className='cursor-pointer font-medium'>
 						<DropdownMenuTrigger>
 							<div
@@ -135,12 +138,15 @@ export default function HeaderMenu({ setActivePage }) {
 								</div>
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem className={'font-medium underline text-xs cursor-pointer'} onClick={() => setActivePage('Loja')}>Configurar horários</DropdownMenuItem>
+							<DropdownMenuItem className={'font-medium underline text-xs cursor-pointer'} onClick={() => setActivePage('Loja')}>
+								<Clock size={20} color="#000000" strokeWidth={2} />
+								Configurar horários
+							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 
 					<DropdownMenu className='font-medium'>
-						<DropdownMenuTrigger className='cursor-pointer'>
+						<DropdownMenuTrigger className='cursor-pointer hover:bg-slate-500/10 px-4 py-1 transition-colors duration-300 rounded-md'>
 							<div className='flex items-center gap-3'>
 								<span className='text-sm font-semibold'>{store?.name || ''}</span>
 								{store?.image ? (
@@ -154,12 +160,15 @@ export default function HeaderMenu({ setActivePage }) {
 							<DropdownMenuLabel>Minha conta</DropdownMenuLabel>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Loja')}>
+								<Store size={20} color="#000000" strokeWidth={2} />
 								Detalhes da loja
 							</DropdownMenuItem>
 							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Loja')}>
+								<CreditCard size={20} color="#000000" strokeWidth={2} />
 								Detalhes do plano
 							</DropdownMenuItem>
 							<DropdownMenuItem className={'cursor-pointer text-red-500'} onClick={handleLogout}>
+								<LogOut size={20} color="red" strokeWidth={2} />
 								Sair
 							</DropdownMenuItem>
 						</DropdownMenuContent>
