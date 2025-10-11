@@ -72,28 +72,45 @@ export default function HeaderMenu({ setActivePage }) {
 	useEffect(() => {
 		const fetchLoja = async () => {
 			try {
-				const res = await api.get(`/store/${fk_store_id}`)
-				const data = res.data.data
-				setStore(data)
-				const now = new Date()
-				const currentTime = now.toTimeString().split(' ')[0] // pega "HH:MM:SS"
-				let isClosed = data.is_closed // valor atual do banco
-				if (currentTime >= data.close_time || currentTime < data.open_time) {
-					isClosed = 1 // fecha a loja
-				}
-				// Atualiza o isActive do frontend
-				setIsActive(isClosed === 0)
+				// 1️⃣ Busca dados da loja
+				const resLoja = await api.get(`/store/${fk_store_id}`)
+				const loja = resLoja.data.data
+
+				// 2️⃣ Busca dias de funcionamento
+				const resDias = await api.get(`/store-day/all?fk_store_id=${fk_store_id}`)
+				const dias = resDias.data.data
+
+				setStore(loja)
+
+				// 3️⃣ Descobre qual o dia da semana atual (0 = domingo, 6 = sábado)
+				const hoje = new Date().getDay()
+
+				// 4️⃣ Verifica se hoje está marcado como aberto
+				const diaDeHoje = dias.find((d) => d.weekday === hoje)
+				const isDiaAberto = diaDeHoje ? diaDeHoje.is_open === 1 : false
+
+				// 5️⃣ Pega hora atual e compara com horário de funcionamento
+				const agora = new Date()
+				const horaAtual = agora.toTimeString().split(' ')[0] // "HH:MM:SS"
+
+				const estaDentroDoHorario = horaAtual >= loja.open_time && horaAtual < loja.close_time
+
+				// 6️⃣ Define se está ativo (só se o dia é aberto e dentro do horário)
+				const isLojaAtiva = isDiaAberto && estaDentroDoHorario && loja.is_closed === 0
+
+				setIsActive(isLojaAtiva)
 			} catch (err) {
 				showAlert(
 					ErrorAlert,
 					{
-						title: 'Perfil não encontrado!',
+						title: 'Erro ao buscar loja',
 						text: `${err}`,
 					},
 					1500
 				)
 			}
 		}
+
 		if (fk_store_id) fetchLoja()
 	}, [fk_store_id])
 
@@ -138,8 +155,11 @@ export default function HeaderMenu({ setActivePage }) {
 								</div>
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem className={'font-medium underline text-xs cursor-pointer'} onClick={() => setActivePage('Loja')}>
-								<Clock size={20} color="#000000" strokeWidth={2} />
+							<DropdownMenuItem
+								className={'font-medium underline text-xs cursor-pointer'}
+								onClick={() => setActivePage('Loja')}
+							>
+								<Clock size={20} color='#000000' strokeWidth={2} />
 								Configurar horários
 							</DropdownMenuItem>
 						</DropdownMenuContent>
@@ -160,15 +180,15 @@ export default function HeaderMenu({ setActivePage }) {
 							<DropdownMenuLabel>Minha conta</DropdownMenuLabel>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Loja')}>
-								<Store size={20} color="#000000" strokeWidth={2} />
+								<Store size={20} color='#000000' strokeWidth={2} />
 								Detalhes da loja
 							</DropdownMenuItem>
 							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Loja')}>
-								<CreditCard size={20} color="#000000" strokeWidth={2} />
+								<CreditCard size={20} color='#000000' strokeWidth={2} />
 								Detalhes do plano
 							</DropdownMenuItem>
 							<DropdownMenuItem className={'cursor-pointer text-red-500'} onClick={handleLogout}>
-								<LogOut size={20} color="red" strokeWidth={2} />
+								<LogOut size={20} color='red' strokeWidth={2} />
 								Sair
 							</DropdownMenuItem>
 						</DropdownMenuContent>

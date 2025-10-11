@@ -11,10 +11,10 @@ export default function IndexPage({ page }) {
       <HeaderMenu setActivePage={setActivePage} />
       <div className='flex flex-1 overflow-hidden'>
         <SideMenu activePage={activePage} setActivePage={setActivePage} />
-        <main className='flex-1 pt-[20px] px-[20px] overflow-y-auto relative'>
+        <main className='flex-1 md:p-5 p-0 overflow-y-auto relative'>
           <div className='px-3 pb-10'>
-            <span className='text-4xl font-medium'>{activePage}</span>
-            <div className='mt-6'>
+            {/* <span className='text-2xl font-bold small-caps underline text-dulivi'>{activePage}</span> */}
+            <div className='mt-0 6'>
               <PageRenderer activePage={activePage} />
             </div>
           </div>

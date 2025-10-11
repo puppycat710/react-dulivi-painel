@@ -7,7 +7,7 @@ import SvgStore from '../components/svg/SvgStore'
 
 export default function SideMenu({ activePage, setActivePage }) {
 	return (
-		<aside className='bg-white w-[258px] min-h-[calc(100dvh-64px)] md:min-h-[calc(100vh-64px)] border-r-[1px] border-[#d9d9d9]'>
+		<aside className='bg-white w-[258px] min-h-[calc(100dvh-64px)] md:min-h-[calc(100vh-64px)] border-r-[1px] border-[#d9d9d9] md:block hidden'>
 			<ul className='font-medium'>
 				<li
 					onClick={() => setActivePage('Início')}

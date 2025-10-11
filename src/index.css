@@ -29,6 +29,10 @@ body {
 	color: #30333c;
 }
 
+.small-caps {
+  font-variant-caps: all-small-caps;
+}
+
 @theme inline {
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
