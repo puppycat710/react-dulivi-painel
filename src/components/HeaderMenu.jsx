@@ -12,10 +12,12 @@ import { Switch } from '../../components/ui/switch'
 import SvgUser from '../components/svg/SvgUser'
 import SvgStatus from '../components/svg/SvgStatus'
 import SvgLogo from '../components/svg/SvgLogo'
+// Alerts
+import SuccessAlert from './SuccessAlert'
+import ErrorAlert from './ErrorAlert'
+import { useAlert } from '../hooks/useAlert'
 // Icon
 import { Clock, CreditCard, LogOut, Store } from 'lucide-react'
-// Hooks
-import { useAlert } from '../hooks/useAlert'
 // API
 import { api } from '../services/api'
 // Component
@@ -75,26 +77,20 @@ export default function HeaderMenu({ setActivePage }) {
 				// 1️⃣ Busca dados da loja
 				const resLoja = await api.get(`/store/${fk_store_id}`)
 				const loja = resLoja.data.data
-
+				setStore(loja)
 				// 2️⃣ Busca dias de funcionamento
 				const resDias = await api.get(`/store-day/all?fk_store_id=${fk_store_id}`)
 				const dias = resDias.data.data
-
-				setStore(loja)
-
 				// 3️⃣ Descobre qual o dia da semana atual (0 = domingo, 6 = sábado)
 				const hoje = new Date().getDay()
-
 				// 4️⃣ Verifica se hoje está marcado como aberto
 				const diaDeHoje = dias.find((d) => d.weekday === hoje)
 				const isDiaAberto = diaDeHoje ? diaDeHoje.is_open === 1 : false
-
 				// 5️⃣ Pega hora atual e compara com horário de funcionamento
 				const agora = new Date()
 				const horaAtual = agora.toTimeString().split(' ')[0] // "HH:MM:SS"
 
 				const estaDentroDoHorario = horaAtual >= loja.open_time && horaAtual < loja.close_time
-
 				// 6️⃣ Define se está ativo (só se o dia é aberto e dentro do horário)
 				const isLojaAtiva = isDiaAberto && estaDentroDoHorario && loja.is_closed === 0
 
@@ -157,7 +153,7 @@ export default function HeaderMenu({ setActivePage }) {
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
 								className={'font-medium underline text-xs cursor-pointer'}
-								onClick={() => setActivePage('Loja')}
+								onClick={() => setActivePage('Conta')}
 							>
 								<Clock size={20} color='#000000' strokeWidth={2} />
 								Configurar horários
@@ -179,11 +175,11 @@ export default function HeaderMenu({ setActivePage }) {
 						<DropdownMenuContent>
 							<DropdownMenuLabel>Minha conta</DropdownMenuLabel>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Loja')}>
+							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Conta')}>
 								<Store size={20} color='#000000' strokeWidth={2} />
 								Detalhes da loja
 							</DropdownMenuItem>
-							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Loja')}>
+							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Conta')}>
 								<CreditCard size={20} color='#000000' strokeWidth={2} />
 								Detalhes do plano
 							</DropdownMenuItem>

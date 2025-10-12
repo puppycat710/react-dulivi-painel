@@ -7,7 +7,7 @@ import SvgStore from '../components/svg/SvgStore'
 
 export default function SideMenu({ activePage, setActivePage }) {
 	return (
-		<aside className='bg-white w-[258px] min-h-[calc(100dvh-64px)] md:min-h-[calc(100vh-64px)] border-r-[1px] border-[#d9d9d9] md:block hidden'>
+		<aside className='bg-white w-[258px] min-h-[calc(100dvh-64px)] md:min-h-[calc(100vh-64px)] border-r-[1px] border-[#d9d9d9] lg:block hidden'>
 			<ul className='font-medium'>
 				<li
 					onClick={() => setActivePage('Início')}
@@ -105,9 +105,9 @@ export default function SideMenu({ activePage, setActivePage }) {
 					</a>
 				</li>
 				<li
-					onClick={() => setActivePage('Loja')}
+					onClick={() => setActivePage('Conta')}
 					className={`group py-3 px-2 border-l-3 cursor-pointer ${
-						activePage === 'Loja'
+						activePage === 'Conta'
 							? 'bg-dulivi/10 border-dulivi text-dulivi'
 							: 'border-transparent'
 					}`}
@@ -115,12 +115,12 @@ export default function SideMenu({ activePage, setActivePage }) {
 					<a className='flex items-center gap-2 group-hover:text-dulivi'>
 						<SvgStore
 							className={`w-[22px] h-[22px] ${
-								activePage === 'Loja' ? 'fill-dulivi' : 'group-hover:fill-dulivi'
+								activePage === 'Conta' ? 'fill-dulivi' : 'group-hover:fill-dulivi'
 							}`}
 							width='22px'
 							height='22px'
 						/>
-						Loja
+						Conta
 					</a>
 				</li>
 			</ul>

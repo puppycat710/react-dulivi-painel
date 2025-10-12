@@ -30,7 +30,7 @@ export default function PageRenderer({ activePage }) {
 			return <Contact />
 		case 'Grupos':
 			return <Group />
-		case 'Loja':
+		case 'Conta':
 			return <Store />
 		default:
 			return <Order />

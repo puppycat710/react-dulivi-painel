@@ -11,7 +11,6 @@ import { Switch } from '../../components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
 // Lucide Icon
 import { AlarmClock, CalendarDays, Image, MapPinned, NotebookText, Truck } from 'lucide-react'
-// Alert
 // Alerts
 import SuccessAlert from './SuccessAlert'
 import ErrorAlert from './ErrorAlert'
@@ -177,7 +176,8 @@ export default function Store() {
 					title: 'Loja atualizada com sucesso!',
 					text: 'O item foi atualizado.',
 				},
-				1500
+				1500,
+				() => (window.location.href = '/conta')
 			)
 			setEditando(false)
 		} catch (error) {
@@ -194,13 +194,24 @@ export default function Store() {
 	// Update Store Days
 	const handleSalvarDias = async () => {
 		try {
-			for (const [weekday, { id, is_open }] of Object.entries(openDays)) {
-				await api.put(
-					`/store-day/update/${id}`,
-					{ data: { is_open: is_open ? 1 : 0 } },
+			// Filtra apenas os dias que foram alterados
+			const diasAlterados = Object.entries(openDays).filter(([_, { isDirty }]) => isDirty)
+			// Faz update só nos dias modificados
+			for (const [weekday, { is_open }] of diasAlterados) {
+				await api.post(
+					`/store-day/upsert`,
+					{ data: { weekday, is_open: is_open ? 1 : 0 }, fk_store_id },
 					{ headers: { Authorization: `Bearer ${token}` } }
 				)
 			}
+			// Atualiza estado local limpando os isDirty
+			setOpenDays((prev) => {
+				const updated = { ...prev }
+				for (const [day] of diasAlterados) {
+					updated[day] = { ...updated[day], isDirty: false }
+				}
+				return updated
+			})
 		} catch (err) {
 			showAlert(
 				ErrorAlert,
@@ -458,7 +469,6 @@ export default function Store() {
 						</div>
 						<Separator className={'my-2'} />
 					</div>
-
 					<div className='col-span-full'>
 						<div className='grid grid-cols-2 sm:grid-cols-4 gap-2'>
 							{daysOfWeek.map((day) => (
@@ -470,7 +480,13 @@ export default function Store() {
 										onCheckedChange={(checked) =>
 											setOpenDays((prev) => ({
 												...prev,
-												[day.value]: { ...prev[day.value], is_open: checked },
+												[day.value]: {
+													...prev[day.value],
+													id: prev[day.value]?.id ?? day.id, // garante que o id não se perca
+													weekday: day.value, // útil pra identificar no backend
+													is_open: checked,
+													isDirty: true,
+												},
 											}))
 										}
 									/>

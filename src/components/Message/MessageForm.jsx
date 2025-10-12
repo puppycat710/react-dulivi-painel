@@ -19,17 +19,14 @@ import { api } from '../../services/api'
 
 const initialForm = {
 	text: '',
-	image: '',
-	send_at: '',
-	fk_group_id: '',
-	fk_store_id: '',
+	fk_group_id: ''
 }
 
 export default function GroupForm() {
 	const [form, setForm] = useState(initialForm)
 	const { alert, showAlert } = useAlert()
 	const [open, setOpen] = useState(false)
-	const [date, setDate] = useState('')
+	const [date, setDate] = useState(new Date())
 	const [time, setTime] = useState('10:30:00')
 	const [groups, setGroups] = useState([])
 	const fk_store_id = sessionStorage.getItem('fk_store_id')
@@ -91,12 +88,12 @@ export default function GroupForm() {
 	}
 	// Create Message
 	const handleMessage = async () => {
-		if (!form.text || !form.fk_group_id || form.frequency || !fk_store_id || !date || !time) {
+		if (!form.text || !form.fk_group_id || !form.frequency || !fk_store_id || !date || !time) {
 			showAlert(
 				ErrorAlert,
 				{
 					title: 'Campos obrigatórios',
-					text: 'Preencha todos os campos antes de salvar.',
+					text: `Preencha todos os campos antes de salvar.`,
 				},
 				1500
 			)

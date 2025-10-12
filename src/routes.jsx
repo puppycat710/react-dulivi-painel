@@ -81,6 +81,14 @@ export const RoutesComponent = () => {
 						</PrivateRoute>
 					}
 				/>
+				<Route
+					path='/conta'
+					element={
+						<PrivateRoute>
+							<IndexPage page={'Conta'} />
+						</PrivateRoute>
+					}
+				/>
 				<Route path='*' element={<NotFound />} />
 			</Routes>
 		</BrowserRouter>
