@@ -63,9 +63,14 @@ export function DeliveryActions({ deliveryArea }) {
 	// Update Delivery Area
 	const handleUpdateDeliveryArea = async () => {
 		try {
+			const payload = {
+				...form,
+				fk_store_id: Number(fk_store_id),
+			}
+
 			await api.put(
 				`/deliveryarea/update/${form.id}`,
-				{ data: form },
+				{ data: payload },
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,

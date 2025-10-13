@@ -91,7 +91,12 @@ export default function DeliveryForm() {
 		}
 
 		try {
-			await api.post('/deliveryarea/create', form, {
+			const payload = {
+				...form,
+				fk_store_id: Number(fk_store_id),
+			}
+
+			await api.post('/deliveryarea/create', payload, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
