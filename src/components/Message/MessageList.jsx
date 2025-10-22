@@ -10,10 +10,17 @@ import {
 	TableRow,
 } from '../../../components/ui/table'
 import { MessageActions } from './MessageActions'
+// Alerts
+import SuccessAlert from '../SuccessAlert'
+import ErrorAlert from '../ErrorAlert'
+import { useAlert } from '../../hooks/useAlert'
 
 export default function GroupList() {
 	const [messages, setMessages] = useState([])
 	const [groupsMap, setGroupsMap] = useState({})
+	//Alert
+	const { alert, showAlert } = useAlert()
+	//Session
 	const fk_store_id = sessionStorage.getItem('fk_store_id')
 	const token = sessionStorage.getItem('token')
 
@@ -83,40 +90,43 @@ export default function GroupList() {
 	}, [])
 
 	return (
-		<Table>
-			<TableCaption>Lista de disparos cadastrados</TableCaption>
-			<TableHeader>
-				<TableRow>
-					<TableHead>Texto do disparo</TableHead>
-					<TableHead>Data</TableHead>
-					<TableHead>Horário</TableHead>
-					<TableHead>Grupo de contatos</TableHead>
-					<TableHead>Frequência</TableHead>
-				</TableRow>
-			</TableHeader>
-			<TableBody>
-				{messages.map((message) => (
-					<TableRow key={message.id}>
-						<TableCell>{message.text}</TableCell>
-						<TableCell>{message.date}</TableCell>
-						<TableCell>{message.time.slice(0, 5)}</TableCell>
-						<TableCell>{groupsMap[message.fk_group_id] || 'Grupo não encontrado'}</TableCell>
-						<TableCell>
-							{message.frequency === 'weekdays'
-								? 'De segunda a sexta'
-								: message.frequency === 'daily'
-								? 'Todos os dias'
-								: message.frequency === 'once'
-								? 'Apenas uma vez'
-								: ''}
-						</TableCell>
-
-						<TableCell className='text-right'>
-							<MessageActions message={message} />
-						</TableCell>
+		<>
+			<Table>
+				<TableCaption>Lista de disparos cadastrados</TableCaption>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Texto do disparo</TableHead>
+						<TableHead>Data</TableHead>
+						<TableHead>Horário</TableHead>
+						<TableHead>Grupo de contatos</TableHead>
+						<TableHead>Frequência</TableHead>
 					</TableRow>
-				))}
-			</TableBody>
-		</Table>
+				</TableHeader>
+				<TableBody>
+					{messages.map((message) => (
+						<TableRow key={message.id}>
+							<TableCell>{message.text}</TableCell>
+							<TableCell>{message.date}</TableCell>
+							<TableCell>{message.time.slice(0, 5)}</TableCell>
+							<TableCell>{groupsMap[message.fk_group_id] || 'Grupo não encontrado'}</TableCell>
+							<TableCell>
+								{message.frequency === 'weekdays'
+									? 'De segunda a sexta'
+									: message.frequency === 'daily'
+									? 'Todos os dias'
+									: message.frequency === 'once'
+									? 'Apenas uma vez'
+									: ''}
+							</TableCell>
+
+							<TableCell className='text-right'>
+								<MessageActions message={message} />
+							</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+			{alert}
+		</>
 	)
 }

@@ -17,14 +17,12 @@ import { api } from '../../services/api'
 const initialForm = {
 	title: '',
 	description: '',
-	price: 0,
-	weight_grams: 0,
-	servings: 0,
+	price: '',
 	image: '',
-	fk_store_categories_id: '',
+	fk_complement_group_id: '',
 }
 
-export default function ProductForm() {
+export default function ComplementForm() {
 	const [form, setForm] = useState(initialForm)
 	const [categories, setCategories] = useState([])
 	const [uploading, setUploading] = useState(false)
@@ -38,8 +36,8 @@ export default function ProductForm() {
 	useEffect(() => {
 		async function fetchCategories() {
 			try {
-				const res = await api.get(`/category/all?fk_store_id=${fk_store_id}`)
-				setCategories(res.data.data)
+				const res = await api.get(`/complement-group/all?fk_store_id=${fk_store_id}`)
+				setCategories(res.data)
 			} catch (err) {
 				showAlert(
 					ErrorAlert,
@@ -85,9 +83,9 @@ export default function ProductForm() {
 			setUploading(false)
 		}
 	}
-	// Create Product
+	// Create Complement
 	const handleCreateProduct = async () => {
-		if (!form.title || !form.price || !form.fk_store_categories_id) {
+		if (!form.title || !form.fk_complement_group_id) {
 			showAlert(
 				ErrorAlert,
 				{
@@ -102,11 +100,11 @@ export default function ProductForm() {
 		try {
 			const payload = {
 				...form,
-				fk_store_categories_id: Number(form.fk_store_categories_id),
+				fk_complement_group_id: Number(form.fk_complement_group_id),
 				fk_store_id: Number(fk_store_id),
 			}
 
-			await api.post('/product/create', payload, {
+			await api.post('/complement/create', payload, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
@@ -128,7 +126,7 @@ export default function ProductForm() {
 				text: 'O item foi cadastrado.',
 			},
 			1500,
-			() => (window.location.href = '/produtos')
+			() => (window.location.href = '/complementos')
 		)
 	}
 	const handleCreateError = () => {
@@ -136,11 +134,11 @@ export default function ProductForm() {
 		showAlert(
 			ErrorAlert,
 			{
-				title: 'Erro ao cadastrar produto!',
+				title: 'Erro ao cadastrar item!',
 				text: 'O item foi cadastrado.',
 			},
 			1500,
-			() => (window.location.href = '/produtos')
+			() => (window.location.href = '/complementos')
 		)
 	}
 	// Upload Alert
@@ -153,13 +151,13 @@ export default function ProductForm() {
 				text: 'A imagem não foi cadastrada.',
 			},
 			1500,
-			() => (window.location.href = '/produtos')
+			() => (window.location.href = '/complementos')
 		)
 	}
 
 	return (
 		<div className='max-w-full mx-auto p-6 border rounded-xl shadow bg-white'>
-			<h1 className='text-2xl font-bold mb-4'>Cadastrar Produto</h1>
+			<h1 className='text-2xl font-bold mb-4'>Cadastrar Complemento</h1>
 
 			<div className='grid gap-4'>
 				<div className='flex flex-col gap-2'>
@@ -180,31 +178,19 @@ export default function ProductForm() {
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='price'>Preço:</Label>
-					<Input name='price' type='number' placeholder='Preço' value={form.price} onChange={handleChange} required />
+					<Input name='price' type='number' placeholder='Preço' value={form.price} onChange={handleChange} />
 				</div>
-
 				<div className='flex flex-col gap-2'>
-					<Label htmlFor='weight_grams'>Peso (g):</Label>
-					<Input
-						name='weight_grams'
-						type='number'
-						placeholder='Peso em gramas'
-						value={form.weight_grams}
-						onChange={handleChange}
-					/>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<Label htmlFor='servings'>Porções:</Label>
-					<Input name='servings' type='number' placeholder='Porções' value={form.servings} onChange={handleChange} />
+					<Label htmlFor='combo_surcharge'>Preço no Combo:</Label>
+					<Input name='combo_surcharge' type='number' placeholder='Preço' value={form.combo_surcharge} onChange={handleChange} />
 				</div>
 				{/* Select de Categoria */}
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='category'>Categoria:</Label>
 					<Select
 						required
-						value={form.fk_store_categories_id?.toString() || ''}
-						onValueChange={(value) => setForm((prev) => ({ ...prev, fk_store_categories_id: Number(value) }))}
+						value={form.fk_complement_group_id?.toString() || ''}
+						onValueChange={(value) => setForm((prev) => ({ ...prev, fk_complement_group_id: Number(value) }))}
 					>
 						<SelectTrigger>
 							<SelectValue placeholder='Selecione uma categoria' />

@@ -67,6 +67,25 @@ export default function SideMenu({ activePage, setActivePage }) {
 					</a>
 				</li>
 				<li
+					onClick={() => setActivePage('Complementos')}
+					className={`group py-3 px-2 border-l-3 cursor-pointer ${
+						activePage === 'Complementos'
+							? 'bg-dulivi/10 border-dulivi text-dulivi'
+							: 'border-transparent'
+					}`}
+				>
+					<a className='flex items-center gap-2 group-hover:text-dulivi'>
+						<SvgProduct
+							className={`w-[20px] h-[20px] ${
+								activePage === 'Complementos' ? 'fill-dulivi' : 'group-hover:fill-dulivi'
+							}`}
+							width='20px'
+							height='20px'
+						/>
+						Complementos
+					</a>
+				</li>
+				<li
 					onClick={() => setActivePage('Delivery')}
 					className={`group py-3 px-2 border-l-3 cursor-pointer ${
 						activePage === 'Delivery'

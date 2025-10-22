@@ -9,6 +9,8 @@ import City from './City'
 import Message from './Message'
 import Group from './Group'
 import Contact from './Contact'
+import Complement from './Complement'
+import ComplementGroup from './ComplementGroup'
 
 export default function PageRenderer({ activePage }) {
 	switch (activePage) {
@@ -20,6 +22,10 @@ export default function PageRenderer({ activePage }) {
 			return <Product />
 		case 'Categorias':
 			return <Category />
+		case 'Complementos':
+			return <Complement />
+		case 'Grupos de complementos':
+			return <ComplementGroup />
 		case 'Delivery':
 			return <Delivery />
 		case 'Cidades':

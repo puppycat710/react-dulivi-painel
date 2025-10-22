@@ -42,6 +42,22 @@ export const RoutesComponent = () => {
 					}
 				/>
 				<Route
+					path='/complementos'
+					element={
+						<PrivateRoute>
+							<IndexPage page={'Complementos'} />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path='/grupos-complementos'
+					element={
+						<PrivateRoute>
+							<IndexPage page={'Grupos de complementos'} />
+						</PrivateRoute>
+					}
+				/>
+				<Route
 					path='/delivery'
 					element={
 						<PrivateRoute>

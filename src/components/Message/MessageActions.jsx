@@ -6,7 +6,6 @@ import { Button } from '../../../components/ui/button'
 import { Textarea } from '../../../components/ui/textarea'
 import { Calendar } from '../../../components/ui/calendar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select'
-import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/popover'
 import {
 	Dialog,
 	DialogContent,
@@ -16,7 +15,6 @@ import {
 	DialogFooter,
 	DialogTrigger,
 } from '../../../components/ui/dialog'
-import { ChevronDownIcon } from 'lucide-react'
 // Button
 import { DeleteButtonWithDialog } from '../DeleteButtonWithDialog'
 // SVG

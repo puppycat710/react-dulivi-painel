@@ -448,7 +448,7 @@ export default function Store() {
 								disabled={!editando}
 							/>
 							<img
-								src={form.image || 'https://via.placeholder.com/160x160?text=Logo'}
+								src={form.image || '/assets/image.png'}
 								alt='Logo da loja'
 								className='w-full h-full object-cover group-hover:opacity-60 transition duration-200'
 							/>

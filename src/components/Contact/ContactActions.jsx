@@ -84,7 +84,7 @@ export function ContactActions({ contact }) {
 			)
 			return
 		}
-
+		console.log(selectedGroups)
 		try {
 			// Atualizar contato
 			await api.put(
