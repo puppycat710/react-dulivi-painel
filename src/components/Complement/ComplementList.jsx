@@ -143,7 +143,7 @@ export default function ComplementList() {
 						{paginatedComplements.map((comp) => (
 							<TableRow key={comp.id}>
 								<TableCell>
-									<img src={comp.image} alt={comp.title} className='w-12 h-12 object-cover rounded' />
+									<img src={comp.image || '/assets/image.png'} alt={comp.title} className='w-12 h-12 object-cover rounded' />
 								</TableCell>
 								<TableCell>{comp.title}</TableCell>
 								<TableCell className='max-w-[250px] truncate'>{comp.description}</TableCell>

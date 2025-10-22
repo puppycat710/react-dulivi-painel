@@ -38,7 +38,7 @@ export default function CategoryList() {
         {categories.map((category) => (
           <TableRow key={category.id}>
             <TableCell>
-              <img src={category.image} alt={category.title} className='w-12 h-12 object-cover rounded' />
+              <img src={category.image || '/assets/image.png'} alt={category.title} className='w-12 h-12 object-cover rounded' />
             </TableCell>
             <TableCell>{category.title}</TableCell>
             <TableCell className='text-right'>
