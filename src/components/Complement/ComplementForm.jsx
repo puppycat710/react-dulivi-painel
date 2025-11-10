@@ -6,7 +6,13 @@ import { Input } from '../../../components/ui/input'
 import { Label } from '../../../components/ui/label'
 import { Button } from '../../../components/ui/button'
 import { Textarea } from '../../../components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '../../../components/ui/select'
 // Alerts
 import SuccessAlert from '../SuccessAlert'
 import ErrorAlert from '../ErrorAlert'
@@ -17,8 +23,9 @@ import { api } from '../../services/api'
 const initialForm = {
 	title: '',
 	description: '',
-	price: '',
+	price: 20,
 	image: '',
+	combo_surcharge: 0,
 	fk_complement_group_id: '',
 }
 
@@ -56,7 +63,10 @@ export default function ComplementForm() {
 		const { name, value } = e.target
 		setForm((prev) => ({
 			...prev,
-			[name]: name === 'price' || name.includes('weight') || name === 'servings' ? Number(value) : value,
+			[name]:
+				name === 'price' || name.includes('weight') || name === 'servings'
+					? Number(value)
+					: value,
 		}))
 	}
 	// Image Upload
@@ -85,16 +95,24 @@ export default function ComplementForm() {
 	}
 	// Create Complement
 	const handleCreateProduct = async () => {
-		if (!form.title || !form.fk_complement_group_id) {
-			showAlert(
-				ErrorAlert,
-				{
-					title: 'Campos obrigatórios',
-					text: 'Preencha todos os campos antes de salvar.',
-				},
-				1500
-			)
-			return
+		const fieldMessages = {
+			title: 'Nome do complemento é obrigatório.',
+			fk_complement_group_id: 'Escolha um grupo de complementos.',
+			price: 'Informe o preço.',
+		}
+
+		for (const field in fieldMessages) {
+			if (!form[field]) {
+				showAlert(
+					ErrorAlert,
+					{
+						title: 'Campo obrigatório',
+						text: fieldMessages[field],
+					},
+					1500
+				)
+				return
+			}
 		}
 
 		try {
@@ -162,7 +180,13 @@ export default function ComplementForm() {
 			<div className='grid gap-4'>
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='title'>Título:</Label>
-					<Input name='title' placeholder='Título' value={form.title} onChange={handleChange} required />
+					<Input
+						name='title'
+						placeholder='Título'
+						value={form.title}
+						onChange={handleChange}
+						required
+					/>
 				</div>
 
 				<div className='flex flex-col gap-2'>
@@ -178,11 +202,23 @@ export default function ComplementForm() {
 
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='price'>Preço:</Label>
-					<Input name='price' type='number' placeholder='Preço' value={form.price} onChange={handleChange} />
+					<Input
+						name='price'
+						type='number'
+						placeholder='Preço'
+						value={form.price}
+						onChange={handleChange}
+					/>
 				</div>
 				<div className='flex flex-col gap-2'>
 					<Label htmlFor='combo_surcharge'>Preço no Combo:</Label>
-					<Input name='combo_surcharge' type='number' placeholder='Preço' value={form.combo_surcharge} onChange={handleChange} />
+					<Input
+						name='combo_surcharge'
+						type='number'
+						placeholder='Preço'
+						value={form.combo_surcharge}
+						onChange={handleChange}
+					/>
 				</div>
 				{/* Select de Categoria */}
 				<div className='flex flex-col gap-2'>
@@ -190,7 +226,9 @@ export default function ComplementForm() {
 					<Select
 						required
 						value={form.fk_complement_group_id?.toString() || ''}
-						onValueChange={(value) => setForm((prev) => ({ ...prev, fk_complement_group_id: Number(value) }))}
+						onValueChange={(value) =>
+							setForm((prev) => ({ ...prev, fk_complement_group_id: Number(value) }))
+						}
 					>
 						<SelectTrigger>
 							<SelectValue placeholder='Selecione uma categoria' />

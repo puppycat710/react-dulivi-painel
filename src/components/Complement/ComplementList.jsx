@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { api } from '../../services/api'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '../../../components/ui/table'
 import { Input } from '../../../components/ui/input'
 import { Button } from '../../../components/ui/button'
 import { ComplementActions } from './ComplementActions'
@@ -47,11 +54,15 @@ export default function ComplementList() {
 	}, [fk_store_id])
 	// Filtragem + Ordenação
 	let filteredComplements = complements.filter((comp) =>
-		[comp.title, comp.description].some((field) => field.toLowerCase().includes(filter.toLowerCase()))
+		[comp.title, comp.description].some((field) =>
+			field.toLowerCase().includes(filter.toLowerCase())
+		)
 	)
 	// aplica ordenação por título OU por preço
 	if (sortPriceAsc !== null) {
-		filteredComplements = filteredComplements.sort((a, b) => (sortPriceAsc ? a.price - b.price : b.price - a.price))
+		filteredComplements = filteredComplements.sort((a, b) =>
+			sortPriceAsc ? a.price - b.price : b.price - a.price
+		)
 	}
 	if (sortTitleAsc !== null) {
 		filteredComplements = filteredComplements.sort((a, b) =>
@@ -143,12 +154,18 @@ export default function ComplementList() {
 						{paginatedComplements.map((comp) => (
 							<TableRow key={comp.id}>
 								<TableCell>
-									<img src={comp.image || '/assets/image.png'} alt={comp.title} className='w-12 h-12 object-cover rounded' />
+									<img
+										src={comp.image || '/assets/image.png'}
+										alt={comp.title}
+										className='w-12 h-12 object-cover rounded'
+									/>
 								</TableCell>
 								<TableCell>{comp.title}</TableCell>
 								<TableCell className='max-w-[250px] truncate'>{comp.description}</TableCell>
-								<TableCell>{comp.price != null ? `R$ ${comp.price.toFixed(2)}` : 'Sem preço'}</TableCell>
-								<TableCell>{comp.combo_surcharge != null ? `R$ ${comp.combo_surcharge.toFixed(2)}` : 'Sem preço'}</TableCell>
+								<TableCell>
+									{comp.price != null ? `R$ ${comp.price.toFixed(2)}` : 'Sem preço'}
+								</TableCell>
+								{comp.combo_surcharge > 0 ? `R$ ${comp.combo_surcharge.toFixed(2)}` : 'Sem preço'}
 								<TableCell>
 									<ComplementActions complement={comp} />
 								</TableCell>
@@ -163,10 +180,18 @@ export default function ComplementList() {
 				<div>
 					{totalRows === 0
 						? 'Nenhum complemento encontrado'
-						: `Mostrando ${start + 1}–${Math.min(end, totalRows)} de ${totalRows} complemento(s)`}
+						: `Mostrando ${start + 1}–${Math.min(
+								end,
+								totalRows
+						  )} de ${totalRows} complemento(s)`}
 				</div>
 				<div className='flex gap-2'>
-					<Button variant='outline' size='sm' onClick={() => setPage((p) => Math.max(p - 1, 0))} disabled={page === 0}>
+					<Button
+						variant='outline'
+						size='sm'
+						onClick={() => setPage((p) => Math.max(p - 1, 0))}
+						disabled={page === 0}
+					>
 						Anterior
 					</Button>
 					<Button

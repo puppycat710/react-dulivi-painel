@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 // Components
 import { Input } from '../../../components/ui/input'
 import { Label } from '../../../components/ui/label'
@@ -29,8 +29,40 @@ export function ComplementGroupActions({ complementGroup }) {
 	const [open, setOpen] = useState(false)
 	const [form, setForm] = useState({ ...complementGroup })
 	const [uploading, setUploading] = useState(false)
+	const [products, setProducts] = useState([])
+	const [selectedProducts, setSelectedProducts] = useState([])
+	//alert
 	const { alert, showAlert } = useAlert()
+	//session
 	const token = sessionStorage.getItem('token')
+	const fk_store_id = sessionStorage.getItem('fk_store_id')
+	// Carregar contatos da loja
+	useEffect(() => {
+		async function fetchProducts() {
+			const res = await api.get(`/product/all?fk_store_id=${fk_store_id}`)
+			setProducts(res.data.data)
+		}
+		fetchProducts()
+	}, [])
+	useEffect(() => {
+		async function fetchComplementGroupProduct() {
+			const res = await api.get(`/complement-group-products/all?fk_store_id=${fk_store_id}`)
+			// pega todos vínculos desse contato
+			const found = res.data.data
+				.filter((cg) => cg.fk_complement_group_id === form.id)
+				.map((cg) => cg.fk_product_id)
+
+			setSelectedProducts(found)
+		}
+
+		if (open) fetchComplementGroupProduct()
+	}, [open])
+	// alternar contato
+	const toggleProduct = (groupId) => {
+		setSelectedProducts((prev) =>
+			prev.includes(groupId) ? prev.filter((g) => g !== groupId) : [...prev, groupId]
+		)
+	}
 	// Input text/number
 	const handleChange = (e) => {
 		const { name, value } = e.target
@@ -52,6 +84,21 @@ export function ComplementGroupActions({ complementGroup }) {
 			await api.put(
 				`/complement-group/update/${form.id}`,
 				{ data: form },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+						'Content-Type': 'application/json',
+					},
+				}
+			)
+			// Atualizar vínculo contato-grupo
+			await api.post(
+				`/complement-group-products/bulk-upsert`, // precisa já ter esse id carregado no form
+				{
+					fk_complement_group_id: form.id,
+					products: selectedProducts,
+					fk_store_id: Number(fk_store_id),
+				},
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -194,6 +241,21 @@ export function ComplementGroupActions({ complementGroup }) {
 									checked={!!form.is_combo_group}
 									onCheckedChange={(checked) => handleSwitchChange(checked, 'is_combo_group')}
 								/>
+							</div>
+							{/* Select de Contatos */}
+							<div className='flex flex-col gap-2'>
+								<Label>Contatos:</Label>
+								<div className='flex flex-col gap-2 max-h-40 overflow-auto border rounded p-2'>
+									{products.map((product) => (
+										<div key={product.id} className='flex items-center gap-2'>
+											<Checkbox
+												checked={selectedProducts.includes(product.id)}
+												onCheckedChange={() => toggleProduct(product.id)}
+											/>
+											<span>{product.title}</span>
+										</div>
+									))}
+								</div>
 							</div>
 						</div>
 

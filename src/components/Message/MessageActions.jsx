@@ -5,7 +5,13 @@ import { Label } from '../../../components/ui/label'
 import { Button } from '../../../components/ui/button'
 import { Textarea } from '../../../components/ui/textarea'
 import { Calendar } from '../../../components/ui/calendar'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '../../../components/ui/select'
 import {
 	Dialog,
 	DialogContent,
@@ -237,13 +243,21 @@ export function MessageActions({ message }) {
 					<DialogContent className='sm:max-w-[600px]'>
 						<DialogHeader>
 							<DialogTitle>Editar Grupo</DialogTitle>
-							<DialogDescription>Atualize os dados e clique em salvar para confirmar.</DialogDescription>
+							<DialogDescription>
+								Atualize os dados e clique em salvar para confirmar.
+							</DialogDescription>
 						</DialogHeader>
 
 						<div className='grid gap-4 py-4'>
 							<div className='flex flex-col gap-2'>
 								<Label htmlFor='text'>Mensagem:</Label>
-								<Textarea name='text' placeholder='Boa noite...' value={form.text} onChange={handleChange} required />
+								<Textarea
+									name='text'
+									placeholder='Boa noite...'
+									value={form.text}
+									onChange={handleChange}
+									required
+								/>
 							</div>
 							<div className='flex gap-4'>
 								{/* Select de Grupos */}
@@ -252,7 +266,9 @@ export function MessageActions({ message }) {
 									<Select
 										required
 										value={form.fk_group_id?.toString() || ''}
-										onValueChange={(value) => setForm((prev) => ({ ...prev, fk_group_id: Number(value) }))}
+										onValueChange={(value) =>
+											setForm((prev) => ({ ...prev, fk_group_id: Number(value) }))
+										}
 									>
 										<SelectTrigger>
 											<SelectValue placeholder='Selecione um grupo' />
@@ -306,7 +322,13 @@ export function MessageActions({ message }) {
 										<Label htmlFor='date-picker' className='px-1'>
 											Data
 										</Label>
-										<Calendar mode='single' selected={date} captionLayout='dropdown' value={date} onSelect={(date) => setDate(date)} />
+										<Calendar
+											mode='single'
+											selected={date}
+											captionLayout='dropdown'
+											value={date}
+											onSelect={(date) => setDate(date)}
+										/>
 									</div>
 									<div className='flex flex-col gap-2'>
 										<Label htmlFor='image'>Imagem:</Label>
