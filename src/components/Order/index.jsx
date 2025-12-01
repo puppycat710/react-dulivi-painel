@@ -3,7 +3,6 @@ import { api } from '../../services/api'
 import OrderCard from './OrderCard'
 import OrderDetailsModal from './OrderDetailsModal'
 
-
 export default function Order() {
 	const [orders, setOrders] = useState([])
 	const [selectedOrderId, setSelectedOrderId] = useState(null)
@@ -14,12 +13,9 @@ export default function Order() {
 	useEffect(() => {
 		const fetchOrders = async () => {
 			try {
-				const response = await api.get('/order/all', {
+				const response = await api.get(`/order/all?fk_store_id=${fk_store_id}`, {
 					headers: {
 						Authorization: `Bearer ${token}`,
-					},
-					params: {
-						fk_store_id: fk_store_id,
 					},
 				})
 				const orders = response.data
@@ -33,7 +29,7 @@ export default function Order() {
 		}
 
 		fetchOrders()
-	}, [])
+	}, [fk_store_id])
 	// Consultar detalhes do pedido
 	useEffect(() => {
 		if (selectedOrderId !== null) {
@@ -68,7 +64,10 @@ export default function Order() {
 				))}
 			</main>
 			{selectedOrderId && (
-				<OrderDetailsModal orderDetails={orderDetails} setSelectedOrderId={setSelectedOrderId} />
+				<OrderDetailsModal
+					orderDetails={orderDetails}
+					setSelectedOrderId={setSelectedOrderId}
+				/>
 			)}
 		</div>
 	)
