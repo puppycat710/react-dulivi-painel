@@ -18,7 +18,7 @@ export default function Order() {
 						Authorization: `Bearer ${token}`,
 					},
 					params: {
-						fk_store_id: fk_store_id,
+						fk_store_id,
 					},
 				})
 
