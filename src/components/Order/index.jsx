@@ -9,6 +9,7 @@ export default function Order() {
 	const [selectedOrderId, setSelectedOrderId] = useState(null)
 	const [orderDetails, setOrderDetails] = useState(null)
 	const token = sessionStorage.getItem('token')
+	const fk_store_id = sessionStorage.getItem('fk_store_id')
 	// Listar todos pedidos
 	useEffect(() => {
 		const fetchOrders = async () => {
@@ -18,7 +19,7 @@ export default function Order() {
 						Authorization: `Bearer ${token}`,
 					},
 					params: {
-						fk_store_id: 1,
+						fk_store_id: fk_store_id,
 					},
 				})
 				const orders = response.data
