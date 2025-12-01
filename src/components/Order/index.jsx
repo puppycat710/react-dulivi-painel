@@ -13,22 +13,26 @@ export default function Order() {
 	useEffect(() => {
 		const fetchOrders = async () => {
 			try {
-				const response = await api.get(`/order/all?fk_store_id=${fk_store_id}`, {
+				const response = await api.get('/order/all', {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
+					params: {
+						fk_store_id: fk_store_id,
+					},
 				})
-				const orders = response.data
 
 				if (response.data.success) {
-					setOrders(orders.data)
+					setOrders(response.data.data)
 				}
 			} catch (err) {
 				console.error('Erro ao buscar pedidos:', err)
 			}
 		}
 
-		fetchOrders()
+		if (fk_store_id && token) {
+			fetchOrders()
+		}
 	}, [fk_store_id, token])
 	// Consultar detalhes do pedido
 	useEffect(() => {
