@@ -29,7 +29,7 @@ export default function Order() {
 		}
 
 		fetchOrders()
-	}, [fk_store_id])
+	}, [fk_store_id, token])
 	// Consultar detalhes do pedido
 	useEffect(() => {
 		if (selectedOrderId !== null) {
