@@ -8,9 +8,22 @@ import { Input } from '../../components/ui/input'
 import { Button } from '../../components/ui/button'
 import { Separator } from '../../components/ui/separator'
 import { Switch } from '../../components/ui/switch'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '../../components/ui/select'
 // Lucide Icon
-import { AlarmClock, CalendarDays, Image, MapPinned, NotebookText, Truck } from 'lucide-react'
+import {
+	AlarmClock,
+	CalendarDays,
+	Image,
+	MapPinned,
+	NotebookText,
+	Truck,
+} from 'lucide-react'
 // Alerts
 import SuccessAlert from './SuccessAlert'
 import ErrorAlert from './ErrorAlert'
@@ -45,13 +58,18 @@ export default function Store() {
 	}, [])
 	// cidades
 	useEffect(() => {
-		if (form?.estado) {
-			axios.get(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${form.estado}/municipios`).then((res) => {
-				const ordenadas = res.data.sort((a, b) => a.nome.localeCompare(b.nome))
-				setCidades(ordenadas)
-			})
+		if (form?.store_state) {
+			axios
+				.get(
+					`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${form.store_state}/municipios`
+				)
+				.then((res) => {
+					const ordenadas = res.data.sort((a, b) => a.nome.localeCompare(b.nome))
+					setCidades(ordenadas)
+				})
 		}
-	}, [form?.estado])
+	}, [form?.store_state])
+
 	// Dias
 	useEffect(() => {
 		const fetchDias = async () => {
@@ -81,6 +99,14 @@ export default function Store() {
 				const store = res.data
 				delete store.data.password
 				setForm(store.data)
+				// 🔹 Carrega as cidades se tiver store_state
+				if (store.data.store_state) {
+					const resCidades = await axios.get(
+						`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${store.data.store_state}/municipios`
+					)
+					const ordenadas = resCidades.data.sort((a, b) => a.nome.localeCompare(b.nome))
+					setCidades(ordenadas)
+				}
 			} catch (err) {
 				console.error('Erro ao buscar loja:', err)
 			}
@@ -95,7 +121,7 @@ export default function Store() {
 	// CEP
 	const handleCepChange = async (e) => {
 		const cep = e.target.value.replace(/\D/g, '')
-		setForm((prev) => ({ ...prev, cep }))
+		setForm((prev) => ({ ...prev, store_zipcode: cep }))
 
 		if (cep.length === 8) {
 			try {
@@ -104,10 +130,10 @@ export default function Store() {
 				if (!data.erro) {
 					setForm((prev) => ({
 						...prev,
-						bairro: data.bairro,
-						rua: data.logradouro,
-						cidade: data.localidade,
-						estado: data.uf,
+						store_suburb: data.bairro,
+						store_street: data.logradouro,
+						store_city: data.localidade,
+						store_state: data.uf,
 					}))
 				}
 			} catch (error) {
@@ -145,9 +171,6 @@ export default function Store() {
 	// Update Store
 	const handleSalvar = async () => {
 		try {
-			const store_location =
-				form.bairro?.trim() && form.cidade?.trim() ? `${form.bairro.trim()}, ${form.cidade.trim()}` : form.store_location
-
 			const dadosAtualizados = {
 				data: {
 					name: form.name,
@@ -157,7 +180,12 @@ export default function Store() {
 					delivery_time_min: Number(form.delivery_time_min),
 					delivery_time_max: Number(form.delivery_time_max),
 					default_delivery_fee: Number(form.default_delivery_fee),
-					store_location,
+					store_street: form.store_street,
+					store_number: form.store_number,
+					store_suburb: form.store_suburb,
+					store_city: form.store_city,
+					store_state: form.store_state,
+					store_zipcode: form.store_zipcode,
 					open_time: formatTime(form.open_time),
 					close_time: formatTime(form.close_time),
 					subscription_status: form.subscription_status || 'inactive',
@@ -266,12 +294,25 @@ export default function Store() {
 
 					<div className='flex flex-col gap-2'>
 						<Label htmlFor='nome'>Nome da Loja</Label>
-						<Input id='nome' name='name' value={form.name} onChange={handleChange} disabled={!editando} />
+						<Input
+							id='nome'
+							name='name'
+							value={form.name}
+							onChange={handleChange}
+							disabled={!editando}
+						/>
 					</div>
 
 					<div className='flex flex-col gap-2'>
 						<Label htmlFor='email'>Email</Label>
-						<Input id='email' name='email' type='email' value={form.email} onChange={handleChange} disabled={!editando} />
+						<Input
+							id='email'
+							name='email'
+							type='email'
+							value={form.email}
+							onChange={handleChange}
+							disabled={!editando}
+						/>
 					</div>
 				</div>
 				{/* ===================== SEÇÃO: HORÁRIOS ===================== */}
@@ -370,14 +411,20 @@ export default function Store() {
 
 					<div className='flex flex-col gap-2'>
 						<Label>CEP</Label>
-						<Input name='cep' type='number' value={form.cep || ''} onChange={handleCepChange} disabled={!editando} />
+						<Input
+							name='store_zipcode'
+							type='number'
+							value={form.store_zipcode || ''}
+							onChange={handleCepChange}
+							disabled={!editando}
+						/>
 					</div>
 
 					<div className='flex flex-col gap-2'>
 						<Label>Estado</Label>
 						<Select
-							onValueChange={(v) => handleChange({ target: { name: 'estado', value: v } })}
-							value={form.estado}
+							onValueChange={(v) => handleChange({ target: { name: 'store_state', value: v } })}
+							value={form.store_state}
 							disabled={!editando}
 						>
 							<SelectTrigger>
@@ -396,9 +443,9 @@ export default function Store() {
 					<div className='flex flex-col gap-2'>
 						<Label>Cidade</Label>
 						<Select
-							onValueChange={(v) => handleChange({ target: { name: 'cidade', value: v } })}
-							value={form.cidade}
-							disabled={!editando || !form.estado}
+							onValueChange={(v) => handleChange({ target: { name: 'store_city', value: v } })}
+							value={form.store_city} // ✅ já pega do form
+							disabled={!editando || !form.store_state}
 						>
 							<SelectTrigger>
 								<SelectValue placeholder='Selecione a cidade' />
@@ -415,17 +462,33 @@ export default function Store() {
 
 					<div className='flex flex-col gap-2'>
 						<Label>Bairro</Label>
-						<Input name='bairro' value={form.bairro} onChange={handleChange} disabled={!editando} />
+						<Input
+							name='store_suburb'
+							value={form.store_suburb}
+							onChange={handleChange}
+							disabled={!editando}
+						/>
 					</div>
 
 					<div className='flex flex-col gap-2'>
 						<Label>Rua</Label>
-						<Input name='rua' value={form.rua} onChange={handleChange} disabled={!editando} />
+						<Input
+							name='store_street'
+							value={form.store_street}
+							onChange={handleChange}
+							disabled={!editando}
+						/>
 					</div>
 
 					<div className='flex flex-col gap-2'>
 						<Label>Número</Label>
-						<Input name='numero' type='number' value={form.numero} onChange={handleChange} disabled={!editando} />
+						<Input
+							name='store_number'
+							type='number'
+							value={form.store_number}
+							onChange={handleChange}
+							disabled={!editando}
+						/>
 					</div>
 				</div>
 				{/* ===================== SEÇÃO: IMAGEM ===================== */}
@@ -472,7 +535,10 @@ export default function Store() {
 					<div className='col-span-full'>
 						<div className='grid grid-cols-2 sm:grid-cols-4 gap-2'>
 							{daysOfWeek.map((day) => (
-								<div key={day.value} className='flex items-center justify-between border rounded-lg px-3 py-2'>
+								<div
+									key={day.value}
+									className='flex items-center justify-between border rounded-lg px-3 py-2'
+								>
 									<span className='text-sm'>{day.label}</span>
 									<Switch
 										disabled={!editando}
