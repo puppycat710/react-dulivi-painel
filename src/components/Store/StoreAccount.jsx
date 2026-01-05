@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react'
 // API
 import axios from 'axios'
-import { api } from '../services/api'
+import { api } from '../../services/api'
 // Shadcn
-import { Label } from '../../components/ui/label'
-import { Input } from '../../components/ui/input'
-import { Button } from '../../components/ui/button'
-import { Separator } from '../../components/ui/separator'
-import { Switch } from '../../components/ui/switch'
+import { Label } from '../../../components/ui/label'
+import { Input } from '../../../components/ui/input'
+import { Button } from '../../../components/ui/button'
+import { Separator } from '../../../components/ui/separator'
+import { Switch } from '../../../components/ui/switch'
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '../../components/ui/select'
+} from '../../../components/ui/select'
 // Lucide Icon
 import {
 	AlarmClock,
@@ -25,11 +25,11 @@ import {
 	Truck,
 } from 'lucide-react'
 // Alerts
-import SuccessAlert from './SuccessAlert'
-import ErrorAlert from './ErrorAlert'
-import { useAlert } from '../hooks/useAlert'
+import SuccessAlert from '../SuccessAlert'
+import ErrorAlert from '../ErrorAlert'
+import { useAlert } from '../../hooks/useAlert'
 
-export default function Store() {
+export default function StoreAccount() {
 	const [editando, setEditando] = useState(false)
 	const [form, setForm] = useState(null)
 	const [estados, setEstados] = useState([])

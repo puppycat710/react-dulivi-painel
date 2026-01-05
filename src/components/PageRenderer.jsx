@@ -11,6 +11,7 @@ import Group from './Group'
 import Contact from './Contact'
 import Complement from './Complement'
 import ComplementGroup from './ComplementGroup'
+import StorePayment from './Store/StorePayment'
 
 export default function PageRenderer({ activePage }) {
 	switch (activePage) {
@@ -38,6 +39,8 @@ export default function PageRenderer({ activePage }) {
 			return <Group />
 		case 'Conta':
 			return <Store />
+		case 'Ativar Pagamento':
+			return <StorePayment />
 		default:
 			return <Order />
 	}

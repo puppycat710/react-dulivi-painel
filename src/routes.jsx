@@ -105,6 +105,14 @@ export const RoutesComponent = () => {
 						</PrivateRoute>
 					}
 				/>
+				<Route
+					path='/ativar'
+					element={
+						<PrivateRoute>
+							<IndexPage page={'Ativar Pagamento'} />
+						</PrivateRoute>
+					}
+				/>
 				<Route path='*' element={<NotFound />} />
 			</Routes>
 		</BrowserRouter>
