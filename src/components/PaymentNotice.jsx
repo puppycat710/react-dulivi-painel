@@ -15,7 +15,7 @@ export default function PaymentNotice() {
 					headers: { Authorization: `Bearer ${token}` },
 				})
 				const store = res.data.data
-				const hasToken = !store.mercadopago_access_token
+				const hasToken = !!store.mercadopago_access_token
 
 				// Abre ou fecha automaticamente
 				if (hasToken && store.is_closed) {
