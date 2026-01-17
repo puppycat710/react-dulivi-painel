@@ -113,6 +113,22 @@ export const RoutesComponent = () => {
 						</PrivateRoute>
 					}
 				/>
+				<Route
+					path='/planos'
+					element={
+						<PrivateRoute>
+							<IndexPage page={'Planos'} />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path='/meu-plano'
+					element={
+						<PrivateRoute>
+							<IndexPage page={'Meu Plano'} />
+						</PrivateRoute>
+					}
+				/>
 				<Route path='*' element={<NotFound />} />
 			</Routes>
 		</BrowserRouter>

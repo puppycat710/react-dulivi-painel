@@ -12,7 +12,7 @@ importers:
         specifier: ^5.2.1
         version: 5.2.2(react-hook-form@7.65.0(react@19.2.0))
       '@mercadopago/sdk-react':
-        specifier: ^1.0.1
+        specifier: ^1.0.6
         version: 1.0.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.14

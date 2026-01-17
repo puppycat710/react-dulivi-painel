@@ -12,6 +12,8 @@ import Contact from './Contact'
 import Complement from './Complement'
 import ComplementGroup from './ComplementGroup'
 import StorePayment from './Store/StorePayment'
+import SubscribeFlow from './SubscribeFlow'
+import MyPlan from './MyPlan'
 
 export default function PageRenderer({ activePage }) {
 	switch (activePage) {
@@ -41,6 +43,10 @@ export default function PageRenderer({ activePage }) {
 			return <Store />
 		case 'Ativar Pagamento':
 			return <StorePayment />
+		case 'Planos':
+			return <SubscribeFlow />
+		case 'Meu Plano':
+			return <MyPlan />
 		default:
 			return <Order />
 	}
