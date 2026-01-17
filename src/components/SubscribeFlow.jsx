@@ -94,17 +94,40 @@ export default function SubscribeFlow() {
 
 	const handleSubscribe = async (e) => {
 		e.preventDefault()
+		if (loading) return
+
 		setLoading(true)
 
+		let cardToken
+
 		try {
-			const cardToken = await createCardToken({
+			cardToken = await createCardToken({
 				cardholderName: form.cardholderName,
 				identificationType: 'CPF',
 				identificationNumber: form.identificationNumber,
 			})
 
-			console.log(cardToken)
+			if (!cardToken?.id) {
+				throw new Error('Token do cartão inválido')
+			}
+		} catch (err) {
+			console.error('Erro ao gerar token:', err)
 
+			showAlert(
+				ErrorAlert,
+				{
+					title: 'Erro no cartão',
+					text: 'Não foi possível validar os dados do cartão.',
+				},
+				1500
+			)
+
+			setLoading(false)
+			return
+		}
+
+		// 👉 DAQUI PRA BAIXO SÓ ASSINATURA
+		try {
 			await axios.post(
 				'https://cardapio-digital-api-nzm1.onrender.com/subscriptions/subscribe',
 				{
@@ -116,30 +139,35 @@ export default function SubscribeFlow() {
 				{ headers: { Authorization: `Bearer ${token}` } }
 			)
 
-			alert('Plano assinado com sucesso!')
 			showAlert(
 				SuccessAlert,
 				{
 					title: 'Plano assinado com sucesso!',
 					text: 'O plano foi assinado com sucesso.',
 				},
-				1500,
-				() => (window.location.href = '/meu-plano')
+				1200
 			)
+
+			// 🔥 redireciona DEPOIS
+			setTimeout(() => {
+				window.location.href = '/meu-plano'
+			}, 1300)
 		} catch (err) {
+			console.error('Erro ao assinar plano:', err)
+
 			showAlert(
 				ErrorAlert,
 				{
 					title: 'Erro ao assinar plano',
-					text: 'O plano não foi assinado.',
+					text: 'Ocorreu um erro ao criar a assinatura.',
 				},
-				1500,
-				() => (window.location.href = '/meu-plano')
+				1500
 			)
 		} finally {
 			setLoading(false)
 		}
 	}
+
 
 	// =========================
 	// STEP 1 — ESCOLHER PLANO
