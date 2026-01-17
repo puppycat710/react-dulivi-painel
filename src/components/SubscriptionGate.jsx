@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import MyPlan from './MyPlan'
+import SubscribeFlow from './SubscribeFlow'
 
 export default function SubscriptionGate() {
 	const [loading, setLoading] = useState(true)
@@ -33,11 +35,11 @@ export default function SubscriptionGate() {
 		check()
 	}, [])
 
-	if (loading) return <p>Carregando...</p>
+	if (loading) return <div className="p-6 text-center text-gray-500"><p>Carregando...</p></div>
 
 	return hasSubscription ? (
-		<button onClick={() => (window.location.href = '/meu-plano')}>Gerenciar plano</button>
+		<MyPlan />
 	) : (
-		<button onClick={() => (window.location.href = '/planos')}>Assinar plano</button>
+		<SubscribeFlow />
 	)
 }

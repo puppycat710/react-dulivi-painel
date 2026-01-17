@@ -10,10 +10,11 @@ import { Button } from '../../../components/ui/button'
 import { Badge } from '../../../components/ui/badge'
 import { api } from '../../services/api'
 
+
 export default function StorePayment() {
 	const [status, setStatus] = useState('desativado')
 	const fk_store_id = sessionStorage.getItem('fk_store_id')
-	const [loading, setLoading] = useState(false)
+	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
 		const fetchStatus = async () => {
@@ -25,6 +26,7 @@ export default function StorePayment() {
 				} else {
 					setStatus('desativado')
 				}
+				setLoading(false)
 			} catch (error) {
 				console.error('Erro ao buscar status do Mercado Pago', error)
 			}
@@ -42,6 +44,8 @@ export default function StorePayment() {
 
 		window.location.href = oauthUrl
 	}
+
+	if (loading) return <div className="p-6 text-center text-gray-500"><p>Carregando...</p></div>
 
 	return (
 		<Card className='w-full max-w-md mx-auto mt-10'>

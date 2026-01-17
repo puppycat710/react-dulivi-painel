@@ -3,6 +3,7 @@ import HeaderMenu from '../components/HeaderMenu'
 import SideMenu from '../components/SideMenu'
 import PageRenderer from '../components/PageRenderer'
 import PaymentNotice from '../components/PaymentNotice'
+import SubscriptionNotice from '../components/SubscriptionNotice'
 
 export default function IndexPage({ page }) {
 	const [activePage, setActivePage] = useState(page)
@@ -13,6 +14,7 @@ export default function IndexPage({ page }) {
 			<div className='flex flex-1 overflow-hidden'>
 				<SideMenu activePage={activePage} setActivePage={setActivePage} />
 				<PaymentNotice />
+				<SubscriptionNotice />
 				<main className='flex-1 md:p-5 p-0 overflow-y-auto relative'>
 					<div className='px-3 pb-10'>
 						{/* <span className='text-2xl font-bold small-caps underline text-dulivi'>{activePage}</span> */}

@@ -28,7 +28,6 @@ import {
 import SuccessAlert from '../SuccessAlert'
 import ErrorAlert from '../ErrorAlert'
 import { useAlert } from '../../hooks/useAlert'
-import SubscriptionGate from '../SubscriptionGate'
 
 export default function StoreAccount() {
 	const [editando, setEditando] = useState(false)
@@ -258,11 +257,10 @@ export default function StoreAccount() {
 		return `${hours}:${minutes}:${seconds || '00'}`
 	}
 
-	if (!form) return <div>Carregando...</div>
+	if (!form) return <div className="p-6 text-center text-gray-500"><p>Carregando...</p></div>
 
 	return (
 		<div className='max-w-full mx-auto md:px-8 px-4 py-12 space-y-6 border rounded-xl shadow bg-white'>
-			<SubscriptionGate />
 			{/* ===================== HEADER ===================== */}
 			<div className='flex justify-between items-center'>
 				<h2 className='text-2xl font-bold'>Configurações da Loja</h2>

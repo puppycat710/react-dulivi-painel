@@ -123,15 +123,13 @@ export default function HeaderMenu({ setActivePage }) {
 					<DropdownMenu className='cursor-pointer font-medium'>
 						<DropdownMenuTrigger>
 							<div
-								className={`flex items-center gap-2 border-1 px-3 py-1 rounded-md cursor-pointer ${
-									isActive === true ? 'border-[#44CCAA]' : 'border-red-500'
-								}`}
+								className={`flex items-center gap-2 border-1 px-3 py-1 rounded-md cursor-pointer ${isActive === true ? 'border-[#44CCAA]' : 'border-red-500'
+									}`}
 							>
 								<div className='relative'>
 									<div
-										className={`absolute top-[9px] left-[11px] ${
-											isActive === true ? 'bg-[#44CCAA]' : 'bg-red-500'
-										} w-[7px] h-[7px] rounded-full`}
+										className={`absolute top-[9px] left-[11px] ${isActive === true ? 'bg-[#44CCAA]' : 'bg-red-500'
+											} w-[7px] h-[7px] rounded-full`}
 									></div>
 									<SvgStatus fill='#7F8F9F' width='17px' height='17px' />
 								</div>
@@ -179,7 +177,7 @@ export default function HeaderMenu({ setActivePage }) {
 								<Store size={20} color='#000000' strokeWidth={2} />
 								Detalhes da loja
 							</DropdownMenuItem>
-							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Conta')}>
+							<DropdownMenuItem className={'cursor-pointer'} onClick={() => setActivePage('Meu Plano')}>
 								<CreditCard size={20} color='#000000' strokeWidth={2} />
 								Detalhes do plano
 							</DropdownMenuItem>

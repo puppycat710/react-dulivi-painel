@@ -9,17 +9,23 @@ import {
 initMercadoPago('APP_USR-a7dfd18d-01b9-4ce6-8ce3-66dfcad07aad')
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { ConfirmButton } from './ConfirmButton'
+import SuccessAlert from './SuccessAlert'
+import ErrorAlert from './ErrorAlert'
+import { useAlert } from '../hooks/useAlert'
 
 export default function MyPlan() {
 	const [sub, setSub] = useState(null)
 	const [loading, setLoading] = useState(false)
 	const [showCardModal, setShowCardModal] = useState(false)
 	const [newPlan, setNewPlan] = useState('')
+	const [confirmType, setConfirmType] = useState(null)
 	const [cardForm, setCardForm] = useState({
 		cardholderName: '',
 		identificationNumber: '',
 	})
-
+	// Alert
+	const { alert, showAlert } = useAlert()
 	const fk_store_id = sessionStorage.getItem('fk_store_id')
 	const token = sessionStorage.getItem('token')
 	const statusMap = {
@@ -76,7 +82,15 @@ export default function MyPlan() {
 
 	const handleUpdateCard = async () => {
 		if (!cardForm.cardholderName || !cardForm.identificationNumber) {
-			alert('Preencha nome e CPF do titular')
+			showAlert(
+				ErrorAlert,
+				{
+					title: 'Preencha nome e CPF do titular',
+					text: 'O cartão não foi atualizado.',
+				},
+				1500,
+				() => (window.location.href = '/meu-plano')
+			)
 			return
 		}
 
@@ -94,11 +108,27 @@ export default function MyPlan() {
 				card_token_id: cardToken.id,
 			})
 
-			alert('Cartão atualizado com sucesso!')
+			showAlert(
+				SuccessAlert,
+				{
+					title: 'Cartão atualizado com sucesso!',
+					text: 'O cartão foi atualizado com sucesso.',
+				},
+				1500,
+				() => (window.location.href = '/meu-plano')
+			)
 			setShowCardModal(false)
 		} catch (err) {
 			console.error(err)
-			alert('Erro ao atualizar cartão')
+			showAlert(
+				ErrorAlert,
+				{
+					title: 'Erro ao atualizar cartão',
+					text: 'O cartão não foi atualizado.',
+				},
+				1500,
+				() => (window.location.href = '/meu-plano')
+			)
 		} finally {
 			setLoading(false)
 		}
@@ -229,7 +259,7 @@ export default function MyPlan() {
 				<div className="flex flex-wrap gap-3">
 					{sub.status === 'authorized' && (
 						<button
-							onClick={() => handleAction(`/subscriptions/${fk_store_id}/pause`)}
+							onClick={() => setConfirmType('pause')}
 							className="px-4 py-2 rounded-lg border hover:bg-gray-100"
 						>
 							Pausar
@@ -254,7 +284,7 @@ export default function MyPlan() {
 					</button>
 
 					<button
-						onClick={() => handleAction(`/subscriptions/${fk_store_id}/cancel`)}
+						onClick={() => setConfirmType('cancel')}
 						className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
 					>
 						Cancelar plano
@@ -354,6 +384,34 @@ export default function MyPlan() {
 					</div>
 				</div>
 			)}
+			{/* Pausar */}
+			{confirmType === 'pause' && (
+				<ConfirmButton
+					open
+					title="Pausar assinatura"
+					description="Ao pausar, sua assinatura ficará temporariamente inativa e você não será cobrado até reativar."
+					confirmText="Pausar assinatura"
+					onCancel={() => setConfirmType(null)}
+					onConfirm={() =>
+						handleAction(`/subscriptions/${fk_store_id}/pause`)
+					}
+				/>
+			)}
+			{/* Cancelar */}
+			{confirmType === 'cancel' && (
+				<ConfirmButton
+					open
+					title="Cancelar assinatura"
+					description="Tem certeza que deseja cancelar seu plano? Essa ação é permanente e não pode ser desfeita."
+					confirmText="Cancelar plano"
+					destructive
+					onCancel={() => setConfirmType(null)}
+					onConfirm={() =>
+						handleAction(`/subscriptions/${fk_store_id}/cancel`)
+					}
+				/>
+			)}
+			{alert}
 		</div>
 	)
 }
